@@ -47,6 +47,9 @@ set(FRAMEWORK_SOURCES
 	"Image.cpp"
 	"Colour.cpp"
 
+	"Maths.cpp"
+	"Rect.cpp"
+
 #	"File.cpp"
 	
 #	"Curves.cpp"
@@ -85,6 +88,7 @@ include(fetch/get_sdl2.cmake)
 include_directories(${PROJECT_SOURCE_DIR}/include/framework)
 include_directories(${PROJECT_SOURCE_DIR}/include/game)
 include_directories(${PROJECT_SOURCE_DIR}/include/external)
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 # Link

@@ -6,6 +6,7 @@
 #include "SDL_image.h"
 
 #include "Graphics.hpp"
+#include "Rect.hpp"
 
 namespace Framework {
 	class Image {
@@ -19,8 +20,10 @@ namespace Framework {
 
 		Image();
 
-		bool load(Graphics* graphics, std::string path, uint8_t flags = Flags::SDL_TEXTURE);
+		bool load(Graphics& graphics, std::string path, uint8_t flags = Flags::SDL_TEXTURE);
 		void free();
+
+		void render(Graphics& graphics, Rect& source_rect, Rect& destination_rect);
 
 		SDL_Texture* get_texture();
 		SDL_Surface* get_surface();

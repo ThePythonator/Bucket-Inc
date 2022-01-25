@@ -1,19 +1,25 @@
-#include "BaseStage.hpp"
 #include "Stages.hpp"
 
 // TitleStage
 
 TitleStage::TitleStage() : BaseStage() {
-
+	temp_x = temp_y = 0;
+	temp_b = false;
 }
 
-void TitleStage::update(float dt) {
+void TitleStage::update(float dt, Framework::InputHandler& input) {
 
+	//printf("%f, %f\n", input.mouse_position().x, input.mouse_position().y);
+	temp_x = input.mouse_position().x;
+	temp_y = input.mouse_position().y;
+	temp_b = input.is_down(Framework::MouseHandler::MouseButton::LEFT);
 }
 
 void TitleStage::render(Framework::Graphics& graphics) {
-	graphics.fill(COLOURS::WHITE);
-	graphics.fill(COLOURS::BLACK);
+	//graphics.fill(COLOURS::WHITE, 0x5F);
+	graphics.fill(Framework::Colour(0x5F, 0xFF, 0xFF, 0x5F));
+	Framework::SDLUtils::SDL_SetRenderDrawColor(graphics.get_renderer(), COLOURS::BLACK);
+	if (temp_b) Framework::SDLUtils::SDL_RenderDrawCircle(graphics.get_renderer(), temp_x, temp_y, 10);
 }
 
 // SettingsStage
@@ -22,7 +28,7 @@ SettingsStage::SettingsStage() : BaseStage() {
 
 }
 
-void SettingsStage::update(float dt) {
+void SettingsStage::update(float dt, Framework::InputHandler& input) {
 
 }
 
@@ -36,7 +42,7 @@ GameStage::GameStage() : BaseStage() {
 
 }
 
-void GameStage::update(float dt) {
+void GameStage::update(float dt, Framework::InputHandler& input) {
 
 }
 
@@ -51,7 +57,7 @@ PausedStage::PausedStage(BaseStage* background_stage) : BaseStage() {
 	_background_stage = background_stage;
 }
 
-void PausedStage::update(float dt) {
+void PausedStage::update(float dt, Framework::InputHandler& input) {
 	if (false) {
 		// Exit pause
 		finish(_background_stage);

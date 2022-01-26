@@ -24,3 +24,28 @@ namespace COLOURS {
 	extern const Framework::Colour BLACK;
 	extern const Framework::Colour WHITE;
 }
+
+namespace TIMINGS {
+	namespace INTRO {
+		namespace DURATION {
+			extern const float INITIAL_DELAY;
+			extern const float FADE_IN;
+			extern const float INTRO_DELAY;
+			extern const float FADE_OUT;
+		}
+
+		namespace CUMULATIVE {
+			extern const float INITIAL_DELAY;
+			extern const float FADE_IN;
+			extern const float INTRO_DELAY;
+			extern const float FADE_OUT;
+		}
+	}
+
+	namespace TITLE {
+		namespace DURATION {
+			extern const float FADE_IN;
+			//extern const float FADE_OUT;
+		}
+	}
+}

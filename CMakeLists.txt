@@ -50,9 +50,10 @@ set(FRAMEWORK_SOURCES
 	"Maths.cpp"
 	"Rect.cpp"
 
+	"Timer.cpp"
+	"Curves.cpp"
+
 #	"File.cpp"
-	
-#	"Curves.cpp"
 
 	"SDLUtils.cpp"
 )

@@ -2,12 +2,29 @@
 
 #include "BaseStage.hpp"
 
+#include "Timer.hpp"
+#include "Curves.hpp"
+
+class IntroStage : public Framework::BaseStage {
+public:
+	IntroStage();
+
+	void update(float dt, Framework::InputHandler& input);
+	void render(Framework::Graphics& graphics);
+
+private:
+	Framework::Timer _intro_timer;
+};
+
 class TitleStage : public Framework::BaseStage {
 public:
 	TitleStage();
 
 	void update(float dt, Framework::InputHandler& input);
 	void render(Framework::Graphics& graphics);
+
+private:
+	Framework::Timer _transition_timer;
 
 	int temp_x, temp_y;
 	bool temp_b;

@@ -7,7 +7,11 @@ namespace Framework {
 
 	void Graphics::fill(const Colour& colour) {
 		SDLUtils::SDL_SetRenderDrawColor(renderer, colour);
-		SDL_RenderClear(renderer); // need workaround for alpha
+		// RenderClear doesn't do alpha
+		//SDL_RenderClear(renderer);
+
+		// So we draw a rectangle over the window instead
+		SDL_RenderFillRect(renderer, NULL);
 	}
 
 	void Graphics::fill(const Colour& colour, uint8_t alpha) {

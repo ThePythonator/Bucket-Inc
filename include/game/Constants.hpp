@@ -1,12 +1,16 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 #include "Colour.hpp"
 
 namespace WINDOW {
 	extern const uint32_t WIDTH;
 	extern const uint32_t HEIGHT;
+
+	extern const uint32_t WIDTH_HALF;
+	extern const uint32_t HEIGHT_HALF;
 
 	extern const char* TITLE;
 
@@ -18,6 +22,30 @@ namespace WINDOW {
 
 namespace STRINGS {
 
+}
+
+namespace PATHS {
+	extern const uint8_t DEPTH;
+
+	namespace IMAGES {
+		extern const std::string LOCATION;
+
+		extern const std::string SPRITESHEET;
+	}
+}
+
+namespace GRAPHICS_OBJECTS {
+	namespace IMAGES {
+		extern const uint8_t MAIN_SPRITESHEET;
+
+		extern const uint8_t TOTAL_IMAGES;
+	}
+
+	namespace SPRITESHEETS {
+		extern const uint8_t MAIN_SPRITESHEET;
+
+		extern const uint8_t TOTAL_SPRITESHEETS;
+	}
 }
 
 namespace COLOURS {
@@ -47,5 +75,17 @@ namespace TIMINGS {
 			extern const float FADE_IN;
 			//extern const float FADE_OUT;
 		}
+	}
+}
+
+namespace SPRITE {
+	extern const uint8_t SIZE;
+	extern const uint8_t SIZE_HALF;
+	extern const uint8_t SCALE;
+
+	extern const uint8_t SPLASH_ICON_SCALE;
+
+	namespace INDEX {
+		extern const uint8_t SPLASH_ICON;
 	}
 }

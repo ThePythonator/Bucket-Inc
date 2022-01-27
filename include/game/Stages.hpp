@@ -10,7 +10,7 @@ public:
 	IntroStage();
 
 	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::Graphics& graphics);
+	void render(Framework::GraphicsObjects& graphics_objects);
 
 private:
 	Framework::Timer _intro_timer;
@@ -21,7 +21,7 @@ public:
 	TitleStage();
 
 	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::Graphics& graphics);
+	void render(Framework::GraphicsObjects& graphics_objects);
 
 private:
 	Framework::Timer _transition_timer;
@@ -35,7 +35,7 @@ public:
 	SettingsStage();
 
 	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::Graphics& graphics);
+	void render(Framework::GraphicsObjects& graphics_objects);
 };
 
 class GameStage : public Framework::BaseStage {
@@ -43,7 +43,7 @@ public:
 	GameStage();
 
 	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::Graphics& graphics);
+	void render(Framework::GraphicsObjects& graphics_objects);
 };
 
 class PausedStage : public Framework::BaseStage {
@@ -51,7 +51,7 @@ public:
 	PausedStage(BaseStage* background_stage);
 
 	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::Graphics& graphics);
+	void render(Framework::GraphicsObjects& graphics_objects);
 
 private:
 	BaseStage* _background_stage;

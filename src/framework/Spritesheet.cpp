@@ -14,31 +14,49 @@ namespace Framework {
 		_default_scale = default_scale;
 
 		// Get width and height of spritesheet
-		SDL_QueryTexture(spritesheet_texture, NULL, NULL, &_w, &_h);
+		int w = 0;
+		int h = 0;
+		SDL_QueryTexture(_spritesheet_image->get_texture(), NULL, NULL, &w, &h);
+
+		_w = static_cast<uint32_t>(w);
+		_h = static_cast<uint32_t>(h);
 
 		_rows = _h / _sprite_size;
 		_columns = _w / _sprite_size;
 	}
 
 	void Spritesheet::sprite(uint16_t index, float x, float y, SpriteTransform transform) {
-		sprite(index, x, y, _default_scale, transform);
+		sprite(index, x, y, static_cast<float>(_default_scale), transform);
 	}
 
 	void Spritesheet::sprite(uint16_t index, float x, float y, float scale, SpriteTransform transform) {
-		// TODO: handle transforms
-		Rect src = Rect(_sprite_size * (index % columns), _sprite_size * (index / columns), _sprite_size, _sprite_size);
-		Rect dst = Rect(x * scale, y * scale, _sprite_size * scale, _sprite_size * scale);
-		_spritesheet_image->render(_graphics, src, dst);
+		Rect src = Rect(_sprite_size * (index % _columns), _sprite_size * (index / _columns), _sprite_size, _sprite_size);
+		rect(src, x, y, scale, transform);
 	}
-
 
 	void Spritesheet::sprite(uint16_t index, float x, float y, float scale, float angle, vec2 centre, SpriteTransform transform) {
+		Rect src = Rect(_sprite_size * (index % _columns), _sprite_size * (index / _columns), _sprite_size, _sprite_size);
+		rect(src, x, y, scale, angle, centre, transform);
+	}
+
+	void Spritesheet::rect(Rect src, float x, float y, SpriteTransform transform) {
+		rect(src, x, y, static_cast<float>(_default_scale), transform);
+	}
+
+	void Spritesheet::rect(Rect src, float x, float y, float scale, SpriteTransform transform) {
 		// TODO: handle transforms
-		// TODO: handle rotations
-		Rect src = Rect(_sprite_size * (index % columns), _sprite_size * (index / columns), _sprite_size, _sprite_size);
-		Rect dst = Rect(x * scale, y * scale, _sprite_size * scale, _sprite_size * scale);
+		Rect dst = Rect(x * scale, y * scale, src.size.x * scale, src.size.y * scale);
 		_spritesheet_image->render(_graphics, src, dst);
 	}
+
+	void Spritesheet::rect(Rect src, float x, float y, float scale, float angle, vec2 centre, SpriteTransform transform) {
+		// TODO: handle transforms
+		// TODO: handle rotations
+		Rect dst = Rect(x * scale, y * scale, src.size.x * scale, src.size.y * scale);
+		_spritesheet_image->render(_graphics, src, dst);
+
+	}
+
 
 	//void Spritesheet::sprite(uint16_t index, float x, float y, float scale) {
 	//	// Render sprite at index from texture to screen

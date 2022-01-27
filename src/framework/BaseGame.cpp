@@ -34,7 +34,7 @@ namespace Framework {
 	// This is due to SDL working in milliseconds, so we can't do any better than 1000/17 = 111 fps or 1000/8 = 125 fps
 	bool BaseGame::main_loop() {
 		// Get start time
-		float start_time = SDL_GetTicks();
+		uint32_t start_time = SDL_GetTicks();
 
 		// 'Calculate' dt
 		//float dt = WINDOW::TARGET_DT;
@@ -69,7 +69,7 @@ namespace Framework {
 		// Clear the screen
 		/*SDLUtils::SDL_SetRenderDrawColor(renderer, COLOURS::BLACK);
 		SDL_RenderClear(renderer);*/
-		graphics.fill(COLOURS::BLACK);
+		graphics_objects.graphics_ptr->fill(COLOURS::BLACK);
 
 		// Render game
 		render();
@@ -78,8 +78,8 @@ namespace Framework {
 		SDL_RenderPresent(renderer);
 
 		// If we were too quick, sleep!
-		float end_time = SDL_GetTicks();
-		float difference = end_time - start_time;
+		uint32_t end_time = SDL_GetTicks();
+		uint32_t difference = end_time - start_time;
 		int ticks_to_sleep = static_cast<int>(WINDOW::TARGET_DT * 1000.0f) - difference;
 		if (ticks_to_sleep > 0) {
 			SDL_Delay(ticks_to_sleep);
@@ -100,7 +100,7 @@ namespace Framework {
 	}
 
 	void BaseGame::render() {
-		stage->render(graphics);
+		stage->render(graphics_objects);
 	}
 
 	bool BaseGame::init() {
@@ -109,10 +109,11 @@ namespace Framework {
 			return false;
 		}
 
+		graphics_objects.graphics_ptr = new Graphics();
+		graphics_objects.graphics_ptr->set_renderer(renderer);
+
 		// Load game data
 		load_data();
-
-		graphics.set_renderer(renderer);
 
 		return true;
 	}

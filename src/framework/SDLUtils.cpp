@@ -42,6 +42,42 @@ namespace Framework::SDLUtils {
 		return renderer != nullptr && window != nullptr;
 	}
 
+	std::string find_assets_path(std::string test_file, uint8_t depth) {
+		printf("Attempting to find assets folder...\n");
+
+		std::string base_path = SDL_GetBasePath();
+
+		SDL_Surface* test_surface = IMG_Load(("assets/" + test_file).c_str());
+
+		if (test_surface != NULL) {
+			base_path = "";
+		}
+
+		uint8_t count = 0;
+		while (test_surface == NULL && count < depth) {
+			test_surface = IMG_Load((base_path + "assets/" + test_file).c_str());
+
+			if (test_surface == NULL) {
+				base_path += "../";
+			}
+
+			count++;
+		}
+
+		if (test_surface == NULL) {
+			printf("Could not find assets folder!\n");
+			return "assets/";
+		}
+
+		SDL_FreeSurface(test_surface);
+
+		std::string message = "Found assets folder: " + base_path + "assets/\n\n";
+
+		printf("%s", message.c_str());
+
+		return base_path + "assets/";
+	}
+
 	int SDL_SetRenderDrawColor(SDL_Renderer* renderer, const Colour& colour) {
 		return SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
 	}

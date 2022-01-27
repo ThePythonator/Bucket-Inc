@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Graphics.hpp"
 #include "Input.hpp"
+#include "GraphicsObjects.hpp"
 
 namespace Framework {
 	class BaseStage {
@@ -9,7 +9,7 @@ namespace Framework {
 		BaseStage();
 
 		virtual void update(float dt, InputHandler& input) = 0;
-		virtual void render(Graphics& graphics) = 0;
+		virtual void render(GraphicsObjects& graphics_objects) = 0;
 
 		BaseStage* next();
 

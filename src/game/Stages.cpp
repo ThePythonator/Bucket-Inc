@@ -14,19 +14,21 @@ void IntroStage::update(float dt, Framework::InputHandler& input) {
 	}
 }
 
-void IntroStage::render(Framework::Graphics& graphics) {
-	graphics.fill(COLOURS::BLACK);
+void IntroStage::render(Framework::GraphicsObjects& graphics_objects) {
+	graphics_objects.graphics_ptr->fill(COLOURS::BLACK);
 
 	// Render icon
-	graphics.fill(COLOURS::WHITE);
+	//graphics_objects.graphics_ptr->fill(COLOURS::WHITE); // to remove
+	graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(SPRITE::INDEX::SPLASH_ICON, WINDOW::WIDTH_HALF / SPRITE::SPLASH_ICON_SCALE - SPRITE::SIZE_HALF, WINDOW::HEIGHT_HALF / SPRITE::SPLASH_ICON_SCALE - SPRITE::SIZE_HALF, SPRITE::SPLASH_ICON_SCALE);
+	//graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(56, 10, 10);
 
 	if (_intro_timer.time() < TIMINGS::INTRO::CUMULATIVE::INITIAL_DELAY) {
 		// Black
-		graphics.fill(COLOURS::BLACK);
+		graphics_objects.graphics_ptr->fill(COLOURS::BLACK);
 	}
 	else if (_intro_timer.time() < TIMINGS::INTRO::CUMULATIVE::FADE_IN) {
 		// Fade in
-		graphics.fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, (_intro_timer.time() - TIMINGS::INTRO::CUMULATIVE::INITIAL_DELAY) / TIMINGS::INTRO::DURATION::FADE_IN));
+		graphics_objects.graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, (_intro_timer.time() - TIMINGS::INTRO::CUMULATIVE::INITIAL_DELAY) / TIMINGS::INTRO::DURATION::FADE_IN));
 	}
 	else if (_intro_timer.time() < TIMINGS::INTRO::CUMULATIVE::INTRO_DELAY) {
 		// Show image
@@ -34,11 +36,11 @@ void IntroStage::render(Framework::Graphics& graphics) {
 	}
 	else if (_intro_timer.time() < TIMINGS::INTRO::CUMULATIVE::FADE_OUT) {
 		// Fade out
-		graphics.fill(COLOURS::BLACK, Framework::Curves::linear(0x00, 0xFF, (_intro_timer.time() - TIMINGS::INTRO::CUMULATIVE::INTRO_DELAY) / TIMINGS::INTRO::DURATION::FADE_OUT));
+		graphics_objects.graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0x00, 0xFF, (_intro_timer.time() - TIMINGS::INTRO::CUMULATIVE::INTRO_DELAY) / TIMINGS::INTRO::DURATION::FADE_OUT));
 	}
 	else {
 		// Black
-		graphics.fill(COLOURS::BLACK);
+		graphics_objects.graphics_ptr->fill(COLOURS::BLACK);
 
 		// Switch to title
 		finish(new TitleStage());
@@ -57,7 +59,6 @@ void TitleStage::update(float dt, Framework::InputHandler& input) {
 
 	if (!_transition_timer.running()) {
 		_transition_timer.start();
-		printf("started\n");
 	}
 
 	//printf("%f, %f\n", input.mouse_position().x, input.mouse_position().y);
@@ -66,15 +67,15 @@ void TitleStage::update(float dt, Framework::InputHandler& input) {
 	temp_b = input.is_down(Framework::MouseHandler::MouseButton::LEFT);
 }
 
-void TitleStage::render(Framework::Graphics& graphics) {
+void TitleStage::render(Framework::GraphicsObjects& graphics_objects) {
 	//graphics.fill(COLOURS::WHITE, 0x5F);
-	graphics.fill(Framework::Colour(0x5F, 0xFF, 0xFF, 0xFF));
-	Framework::SDLUtils::SDL_SetRenderDrawColor(graphics.get_renderer(), COLOURS::BLACK);
-	if (temp_b) Framework::SDLUtils::SDL_RenderDrawCircle(graphics.get_renderer(), temp_x, temp_y, 10);
+	graphics_objects.graphics_ptr->fill(Framework::Colour(0x5F, 0xFF, 0xFF, 0xFF));
+	Framework::SDLUtils::SDL_SetRenderDrawColor(graphics_objects.graphics_ptr->get_renderer(), COLOURS::BLACK);
+	if (temp_b) Framework::SDLUtils::SDL_RenderDrawCircle(graphics_objects.graphics_ptr->get_renderer(), temp_x, temp_y, 10);
 
 	if (_transition_timer.time() < TIMINGS::TITLE::DURATION::FADE_IN) {
 		// Fade in
-		graphics.fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, _transition_timer.time() / TIMINGS::TITLE::DURATION::FADE_IN));
+		graphics_objects.graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, _transition_timer.time() / TIMINGS::TITLE::DURATION::FADE_IN));
 	}
 } 
 
@@ -88,7 +89,7 @@ void SettingsStage::update(float dt, Framework::InputHandler& input) {
 
 }
 
-void SettingsStage::render(Framework::Graphics& graphics) {
+void SettingsStage::render(Framework::GraphicsObjects& graphics_objects) {
 
 }
 
@@ -102,7 +103,7 @@ void GameStage::update(float dt, Framework::InputHandler& input) {
 
 }
 
-void GameStage::render(Framework::Graphics& graphics) {
+void GameStage::render(Framework::GraphicsObjects& graphics_objects) {
 
 }
 
@@ -120,7 +121,7 @@ void PausedStage::update(float dt, Framework::InputHandler& input) {
 	}
 }
 
-void PausedStage::render(Framework::Graphics& graphics) {
+void PausedStage::render(Framework::GraphicsObjects& graphics_objects) {
 	// Render background stage
-	_background_stage->render(graphics);
+	_background_stage->render(graphics_objects);
 }

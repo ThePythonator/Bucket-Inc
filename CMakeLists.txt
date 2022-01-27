@@ -43,8 +43,8 @@ set(FRAMEWORK_SOURCES
 	
 	"Graphics.cpp"
 #	"Text.cpp"
-#	"Spritesheet.cpp"
 	"Image.cpp"
+	"Spritesheet.cpp"
 	"Colour.cpp"
 
 	"Maths.cpp"

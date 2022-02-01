@@ -20,6 +20,8 @@ namespace Framework {
 	extern const float PI;
 	// extern const float EPSILON;
 
+	extern const vec2 VEC_NULL;
+
 	float length_squared(vec2 v);
 	vec2 normalise(vec2 v);
 

@@ -18,9 +18,7 @@ void IntroStage::render(Framework::GraphicsObjects& graphics_objects) {
 	graphics_objects.graphics_ptr->fill(COLOURS::BLACK);
 
 	// Render icon
-	//graphics_objects.graphics_ptr->fill(COLOURS::WHITE); // to remove
 	graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(SPRITE::INDEX::SPLASH_ICON, WINDOW::WIDTH_HALF / SPRITE::SPLASH_ICON_SCALE - SPRITE::SIZE_HALF, WINDOW::HEIGHT_HALF / SPRITE::SPLASH_ICON_SCALE - SPRITE::SIZE_HALF, SPRITE::SPLASH_ICON_SCALE);
-	//graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(56, 10, 10);
 
 	if (_intro_timer.time() < TIMINGS::INTRO::CUMULATIVE::INITIAL_DELAY) {
 		// Black
@@ -68,8 +66,65 @@ void TitleStage::update(float dt, Framework::InputHandler& input) {
 }
 
 void TitleStage::render(Framework::GraphicsObjects& graphics_objects) {
-	//graphics.fill(COLOURS::WHITE, 0x5F);
-	graphics_objects.graphics_ptr->fill(Framework::Colour(0x5F, 0xFF, 0xFF, 0xFF));
+	graphics_objects.graphics_ptr->fill(COLOURS::BLACK);
+
+	// Render background artwork
+	// Empty rect means 0,0,w,h
+	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BACKGROUND]->render(graphics_objects.graphics_ptr, Framework::Rect(Framework::VEC_NULL, WINDOW::SIZE));
+
+	// Render pipes
+	for (uint8_t i = 0; i < SPRITE::PIPES_ARRAY_SIZE; i++) {
+		if (SPRITE::PIPES[i] != 0) {
+			uint32_t x = (i % SPRITE::PIPES_ARRAY_WIDTH) * SPRITE::SIZE;
+			uint32_t y = (i / SPRITE::PIPES_ARRAY_WIDTH) * SPRITE::SIZE;
+
+			uint8_t sprite_index = SPRITE::PIPES[i] - 1;
+
+			if (std::count(SPRITE::INDEX::CRACKED_PIPES_HORIZONTAL.begin(), SPRITE::INDEX::CRACKED_PIPES_HORIZONTAL.end(), sprite_index) > 0) {
+				// sprite_index is a horizontal cracked pipe
+				// We don't want to render cracked pipes right now, instead render a normal pipe
+				sprite_index = SPRITE::INDEX::PIPE_HORIZONTAL;
+			}
+			else if (std::count(SPRITE::INDEX::CRACKED_PIPES_VERTICAL.begin(), SPRITE::INDEX::CRACKED_PIPES_VERTICAL.end(), sprite_index) > 0) {
+				// sprite_index is a vertical cracked pipe
+				// We don't want to render cracked pipes right now, instead render a normal pipe
+				sprite_index = SPRITE::INDEX::PIPE_VERTICAL;
+			}
+
+			graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(sprite_index, x, y);
+		}
+	}
+
+	// Render box thing with wires
+	// TODO
+
+	// Fade out background graphics slightly
+	graphics_objects.graphics_ptr->fill(COLOURS::BLACK, 0x7F);
+
+	// Calculate offset used for animating menu options
+	// TODO: animate (bezier?)
+	float t = _transition_timer.time() / 2.0f;
+	Framework::vec2 offset = t < 1.0f ? Framework::Curves::bezier(std::vector<Framework::vec2>{Framework::vec2{ 0.0f, -WINDOW::SIZE.x * 2 }, Framework::vec2{ 0.0f, 500.0f }, Framework::vec2{ 0.0f, 0.0f }, Framework::VEC_NULL}, t) : Framework::VEC_NULL;
+	//Framework::vec2 offset = Framework::Curves::bezier(std::vector<Framework::vec2>{Framework::VEC_NULL, Framework::vec2{ 100.0f, 50.0f }, Framework::vec2{ 50.0f, 200.0f }, Framework::vec2{ 100.0f, 50.0f }}, _transition_timer.time() / 3.0f);
+
+	// Render background for options
+	Framework::vec2 scaled_size = graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->get_size() * SPRITE::UI_SCALE;
+	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->render(graphics_objects.graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset, scaled_size));
+
+	// need text and font stuff
+	// need button class
+	// Render PLAY
+	// Render SETTINGS
+	// Render QUIT 
+
+	// temp for now, just demoing button image
+
+	scaled_size = graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->get_size() * SPRITE::UI_SCALE;
+	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->render(graphics_objects.graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset - Framework::vec2{ 0.0f, 100.0f }, scaled_size));
+	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->render(graphics_objects.graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset, scaled_size));
+	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->render(graphics_objects.graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset + Framework::vec2{ 0.0f, 100.0f }, scaled_size));
+
+
 	Framework::SDLUtils::SDL_SetRenderDrawColor(graphics_objects.graphics_ptr->get_renderer(), COLOURS::BLACK);
 	if (temp_b) Framework::SDLUtils::SDL_RenderDrawCircle(graphics_objects.graphics_ptr->get_renderer(), temp_x, temp_y, 10);
 
@@ -100,7 +155,8 @@ GameStage::GameStage() : BaseStage() {
 }
 
 void GameStage::update(float dt, Framework::InputHandler& input) {
-
+	// Note: if pausing game, call
+	// finish(new PausedStage(this), false);
 }
 
 void GameStage::render(Framework::GraphicsObjects& graphics_objects) {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "BaseStage.hpp"
 
 #include "Timer.hpp"

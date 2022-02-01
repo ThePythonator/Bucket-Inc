@@ -4,6 +4,8 @@ namespace Framework {
 	const float PI = 3.14159265f;
 	//const float EPSILON = 0.0001f; // todo: check if reasonable
 
+	const vec2 VEC_NULL = vec2{ 0.0f, 0.0f };
+
 	float length_squared(vec2 v) {
 		return linalg::length2(v);
 	}

@@ -14,12 +14,14 @@ namespace Framework {
 		BaseStage* next();
 
 		bool finished();
+		bool delete_me();
 
 	protected:
-		void finish(BaseStage* next);
+		void finish(BaseStage* next, bool can_delete_me = true);
 
 	private:
 		bool _finished = false;
+		bool _delete_me = false;
 		BaseStage* _next = nullptr;
 	};
 }

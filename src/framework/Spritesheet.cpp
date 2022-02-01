@@ -54,7 +54,18 @@ namespace Framework {
 		// TODO: handle rotations
 		Rect dst = Rect(x * scale, y * scale, src.size.x * scale, src.size.y * scale);
 		_spritesheet_image->render(_graphics, src, dst);
+	}
 
+	uint8_t Spritesheet::get_sprite_size() {
+		return _sprite_size;
+	}
+
+	uint8_t Spritesheet::get_scale() {
+		return _default_scale;
+	}
+
+	Image* Spritesheet::get_image() {
+		return _spritesheet_image;
 	}
 
 

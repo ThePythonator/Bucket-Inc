@@ -15,6 +15,10 @@ namespace Framework {
 			return false;
 		}
 
+		// Get width and height
+		_w = temp_surface->w;
+		_h = temp_surface->h;
+
 		// Create texture from image
 		SDL_Texture* temp_texture = SDL_CreateTextureFromSurface(graphics->get_renderer(), temp_surface);
 
@@ -60,12 +64,20 @@ namespace Framework {
 		}
 	}
 
-	void Image::render(Graphics* graphics, Rect& source_rect, Rect& destination_rect) {
-		// Render from texture to screen
-		SDL_Rect src_rect{ static_cast<int>(source_rect.position.x), static_cast<int>(source_rect.position.y), static_cast<int>(source_rect.size.x), static_cast<int>(source_rect.size.y) };
-		SDL_Rect dst_rect{ static_cast<int>(destination_rect.position.x), static_cast<int>(destination_rect.position.y), static_cast<int>(destination_rect.size.x), static_cast<int>(destination_rect.size.y) };
+	void Image::render(Graphics* graphics, Rect source_rect, Rect destination_rect) {
+		if (source_rect.size == vec2{ 0.0f, 0.0f }) {
+			source_rect.size = get_size();
+		}
+		if (destination_rect.size == vec2{ 0.0f, 0.0f }) {
+			destination_rect.size = get_size();
+		}
 
-		SDL_RenderCopy(graphics->get_renderer(), texture, &src_rect, &dst_rect);
+		// Render from texture to screen
+		SDL_RenderCopy(graphics->get_renderer(), texture, &SDLUtils::get_sdl_rect(source_rect), &SDLUtils::get_sdl_rect(destination_rect));
+	}
+
+	void Image::render(Graphics* graphics, Rect destination_rect) {
+		render(graphics, VEC_NULL, destination_rect);
 	}
 
 	// Returns SDL_Texture* if loaded, otherwise returns nullptr
@@ -76,5 +88,15 @@ namespace Framework {
 	// Returns SDL_Surface* if loaded, otherwise returns nullptr
 	SDL_Surface* Image::get_surface() {
 		return surface;
+	}
+
+	vec2 Image::get_size() {
+		return vec2{ static_cast<float>(_w), static_cast<float>(_h)};
+	}
+
+	Image* create_image(Graphics* graphics, std::string path, uint8_t flags) {
+		Image* image_ptr = new Image();
+		image_ptr->load(graphics, path, flags);
+		return image_ptr;
 	}
 }

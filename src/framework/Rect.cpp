@@ -1,10 +1,6 @@
 #include "Rect.hpp"
 
 namespace Framework {
-	Rect::Rect() {
-
-	}
-
 	Rect::Rect(vec2 _position, vec2 _size) {
 		position = _position;
 		size = _size;

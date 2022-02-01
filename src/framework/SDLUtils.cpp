@@ -82,6 +82,32 @@ namespace Framework::SDLUtils {
 		return SDL_SetRenderDrawColor(renderer, colour.r, colour.g, colour.b, colour.a);
 	}
 
+	void SDL_SetTextureColorMod(SDL_Texture* texture, const Colour& colour) {
+		SDL_SetTextureColorMod(texture, colour.r, colour.g, colour.b);
+	}
+
+	void SDL_SetPixel(SDL_Surface* surface, int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+		SDL_LockSurface(surface);
+		((uint32_t*)surface->pixels)[y * surface->w + x] = SDL_MapRGBA(surface->format, r, g, b, a);
+		SDL_UnlockSurface(surface);
+	}
+
+	void SDL_SetPixel(SDL_Surface* surface, int x, int y, const Colour& colour) {
+		SDL_SetPixel(surface, x, y, colour.r, colour.g, colour.b, colour.a);
+	}
+
+	void SDL_GetPixel(SDL_Surface* surface, int x, int y, uint8_t* r, uint8_t* g, uint8_t* b, uint8_t* a) {
+		SDL_LockSurface(surface);
+		SDL_GetRGBA(((uint32_t*)surface->pixels)[y * surface->w + x], surface->format, r, g, b, a);
+		SDL_UnlockSurface(surface);
+	}
+
+	Colour SDL_GetPixel(SDL_Surface* surface, int x, int y) {
+		uint8_t r, g, b, a;
+		SDL_GetPixel(surface, x, y, &r, &g, &b, &a);
+		return Colour(r, g, b, a);
+	}
+
 	int SDL_RenderDrawCircle(SDL_Renderer* renderer, int x, int y, int radius) {
 		// From https://gist.github.com/Gumichan01/332c26f6197a432db91cc4327fcabb1c
 
@@ -121,5 +147,10 @@ namespace Framework::SDLUtils {
 		}
 
 		return status;
+	}
+
+	SDL_Rect get_sdl_rect(Rect rect) {
+		SDL_Rect sdl_rect{ static_cast<int>(rect.position.x), static_cast<int>(rect.position.y), static_cast<int>(rect.size.x), static_cast<int>(rect.size.y) };
+		return sdl_rect;
 	}
 }

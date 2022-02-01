@@ -92,9 +92,14 @@ namespace Framework {
 
 	void BaseGame::update(float dt) {
 		if (stage->finished()) {
-			BaseStage* temp_stage = stage->next();
-			delete stage;
-			stage = temp_stage;
+			if (stage->delete_me()) {
+				BaseStage* temp_stage = stage->next();
+				delete stage;
+				stage = temp_stage;
+			}
+			else {
+				stage = stage->next();
+			}
 		}
 		stage->update(dt, input);
 	}

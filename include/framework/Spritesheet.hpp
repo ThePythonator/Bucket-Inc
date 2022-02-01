@@ -17,6 +17,11 @@ namespace Framework {
 		void rect(Rect rect, float x, float y, float scale, SpriteTransform transform = SpriteTransform::NONE);
 		void rect(Rect rect, float x, float y, float scale, float angle, vec2 centre, SpriteTransform transform = SpriteTransform::NONE);
 
+		uint8_t get_sprite_size();
+		uint8_t get_scale();
+
+		Image* get_image();
+
 		//void sprite_scaled(uint16_t index, float x, float y);
 		//void sprite_scaled(uint16_t index, float x, float y, SDL_RendererFlip flip);
 		//void sprite_scaled(uint16_t index, float x, float y, float angle, SDL_Point* center, SDL_RendererFlip flip = SDL_RendererFlip::SDL_FLIP_NONE);

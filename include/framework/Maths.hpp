@@ -22,6 +22,19 @@ namespace Framework {
 
 	extern const vec2 VEC_NULL;
 
+	class Rect {
+	public:
+		Rect(vec2 _position = VEC_NULL, vec2 _size = VEC_NULL);
+		Rect(float x, float y, float width = 0.0f, float height = 0.0f);
+		Rect(int x, int y, int width, int height);
+
+		vec2 position;
+		vec2 size;
+	};
+
+	bool colliding(Rect a, vec2 b);
+	bool colliding(Rect a, Rect b);
+
 	float length_squared(vec2 v);
 	vec2 normalise(vec2 v);
 

@@ -12,7 +12,9 @@ namespace Framework {
 		}
 
 		// Allow game to get ready
+		// Game must set stage ptr
 		start();
+		stage->init(&graphics_objects, &input);
 
 		// Main game loop
 		bool running = true;
@@ -100,12 +102,13 @@ namespace Framework {
 			else {
 				stage = stage->next();
 			}
+			stage->init(&graphics_objects, &input);
 		}
-		stage->update(dt, input);
+		stage->update(dt);
 	}
 
 	void BaseGame::render() {
-		stage->render(graphics_objects);
+		stage->render();
 	}
 
 	bool BaseGame::init() {
@@ -116,6 +119,11 @@ namespace Framework {
 
 		graphics_objects.graphics_ptr = new Graphics();
 		graphics_objects.graphics_ptr->set_renderer(renderer);
+
+		// Set up graphics_objects vectors:
+		graphics_objects.image_ptrs = std::vector<Framework::Image*>(GRAPHICS_OBJECTS::IMAGES::TOTAL_IMAGES);
+		graphics_objects.spritesheet_ptrs = std::vector<Framework::Spritesheet*>(GRAPHICS_OBJECTS::SPRITESHEETS::TOTAL_SPRITESHEETS);
+		graphics_objects.font_ptrs = std::vector<Framework::Font*>(GRAPHICS_OBJECTS::FONTS::TOTAL_FONTS);
 
 		// Load game data
 		load_data();

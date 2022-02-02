@@ -11,8 +11,8 @@ class IntroStage : public Framework::BaseStage {
 public:
 	IntroStage();
 
-	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::GraphicsObjects& graphics_objects);
+	void update(float dt);
+	void render();
 
 private:
 	Framework::Timer _intro_timer;
@@ -22,8 +22,8 @@ class TitleStage : public Framework::BaseStage {
 public:
 	TitleStage();
 
-	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::GraphicsObjects& graphics_objects);
+	void update(float dt);
+	void render();
 
 private:
 	Framework::Timer _transition_timer;
@@ -36,24 +36,24 @@ class SettingsStage : public Framework::BaseStage {
 public:
 	SettingsStage();
 
-	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::GraphicsObjects& graphics_objects);
+	void update(float dt);
+	void render();
 };
 
 class GameStage : public Framework::BaseStage {
 public:
 	GameStage();
 
-	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::GraphicsObjects& graphics_objects);
+	void update(float dt);
+	void render();
 };
 
 class PausedStage : public Framework::BaseStage {
 public:
 	PausedStage(BaseStage* background_stage);
 
-	void update(float dt, Framework::InputHandler& input);
-	void render(Framework::GraphicsObjects& graphics_objects);
+	void update(float dt);
+	void render();
 
 private:
 	BaseStage* _background_stage;

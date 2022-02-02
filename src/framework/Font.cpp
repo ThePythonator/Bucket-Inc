@@ -5,17 +5,23 @@ namespace Framework {
 	const uint8_t FONT_SHEET_HEIGHT = 3;
 	const uint8_t ALPHABET_LENGTH = FONT_SHEET_WIDTH * FONT_SHEET_HEIGHT;
 
+	const uint8_t ALPHABET_INDEX_START = 32;
+
+	const uint8_t CHAR_DELETE = 127;
+	const uint8_t CHAR_SPACE = ' '; // equivalent to 32
+
+	// Font
+
 	Font::Font() {
 
 	}
-
-	Font::Font(Graphics* graphics, Spritesheet* spritesheet, uint8_t spacing = 1) {
+	Font::Font(Graphics* graphics, Spritesheet* spritesheet, uint8_t spacing) {
 		graphics_ptr = graphics;
 		font_spritesheet_ptr = spritesheet;
 		_spacing = spacing;
 
-		SDL_Surface* font_sheet_surface = spritesheet.get_image()->get_surface();
-		uint8_t sprite_size = spritesheet->get_sprite_size();
+		SDL_Surface* font_sheet_surface = font_spritesheet_ptr->get_image()->get_surface();
+		uint8_t sprite_size = font_spritesheet_ptr->get_sprite_size();
 
 		uint16_t base_x, base_y, x, y, left, right;
 		Colour c;
@@ -99,5 +105,93 @@ namespace Framework {
 				}
 			}
 		}
+	}
+
+	void Font::render_text(std::string text, vec2 position, Colour colour, AnchorPosition anchor_position) {
+		vec2 current_position = position;
+		vec2 size;
+
+		size.y = font_spritesheet_ptr->get_sprite_size();
+
+		for (uint8_t c : text) {
+			// Get width of character
+			size.x += character_rect(c).size.x + _spacing;
+		}
+
+		// We added one too many spaces in the loop:
+		size.x -= _spacing;
+
+		// Handle positioning
+		// Horizontal
+		if (anchor_position & AnchorPosition::RIGHT) {
+			current_position.x -= size.x;
+		}
+		else if (anchor_position & AnchorPosition::CENTER_X) {
+			current_position.x -= size.x / 2.0f;
+		}
+		// Vertical
+		if (anchor_position & AnchorPosition::BOTTOM) {
+			current_position.y -= size.y;
+		}
+		else if (anchor_position & AnchorPosition::CENTER_Y) {
+			current_position.y -= size.y / 2.0f;
+		}
+
+		for (uint8_t c : text) {
+			// Render character
+			render_char(c, current_position);
+
+			// Update current_position.x by getting character width
+			current_position.x += character_rect(c).size.x + _spacing;
+		}
+	}
+
+	Rect Font::character_rect(uint8_t c) {
+		return valid_character(c) ? character_rects[c - ALPHABET_INDEX_START] : Rect();
+	}
+
+	bool Font::valid_character(uint8_t c) {
+		return c >= ALPHABET_INDEX_START && c < ALPHABET_INDEX_START + ALPHABET_LENGTH && c != CHAR_SPACE && c != CHAR_DELETE;
+	}
+
+	void Font::render_char(uint8_t c, vec2 position) {
+		// Check character is one we have an image/rect for (don't include spaces or delete key)
+		if (valid_character(c)) {
+			// Render character
+			font_spritesheet_ptr->rect(character_rects[c - ALPHABET_INDEX_START], position);
+		}
+	}
+
+	void Font::set_colour(Colour colour) {
+		SDLUtils::SDL_SetTextureColorMod(font_spritesheet_ptr->get_image()->get_texture(), colour);
+	}
+
+	// Text
+
+	Text::Text() {
+
+	}
+	Text::Text(Font* font, std::string text, Colour colour, Font::AnchorPosition anchor_position) {
+		_font_ptr = font;
+		_text = text;
+		_colour = colour;
+		_anchor = anchor_position;
+	}
+
+	void Text::render(vec2 position) {
+		render(position, _colour, _anchor);
+	}
+	void Text::render(vec2 position, Colour colour) {
+		render(position, colour, _anchor);
+	}
+	void Text::render(vec2 position, Font::AnchorPosition anchor_position) {
+		render(position, _colour, anchor_position);
+	}
+	void Text::render(vec2 position, Colour colour, Font::AnchorPosition anchor_position) {
+		_font_ptr->render_text(_text, position, colour, anchor_position);
+	}
+
+	void Text::set_text(std::string text) {
+		_text = text;
 	}
 }

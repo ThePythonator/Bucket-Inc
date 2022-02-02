@@ -37,18 +37,20 @@ set(FRAMEWORK_SOURCES
 	"Input.cpp"
 	"Keys.cpp"
 	"Mouse.cpp"
+
+	"Button.cpp"
 	
 	"Audio.cpp"
 	"Sound.cpp"
 	
 	"Graphics.cpp"
-#	"Text.cpp"
+	"Font.cpp"
 	"Image.cpp"
 	"Spritesheet.cpp"
+
 	"Colour.cpp"
 
 	"Maths.cpp"
-	"Rect.cpp"
 
 	"Timer.cpp"
 	"Curves.cpp"

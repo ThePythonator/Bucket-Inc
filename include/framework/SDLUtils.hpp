@@ -8,7 +8,7 @@
 
 #include "Constants.hpp"
 
-#include "Rect.hpp"
+#include "Maths.hpp"
 
 namespace Framework::SDLUtils {
 

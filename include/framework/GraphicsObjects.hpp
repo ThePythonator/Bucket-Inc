@@ -6,6 +6,7 @@
 
 #include "Image.hpp"
 #include "Spritesheet.hpp"
+#include "Font.hpp"
 
 namespace Framework {
 	struct GraphicsObjects {
@@ -13,5 +14,6 @@ namespace Framework {
 
 		std::vector<Image*> image_ptrs;
 		std::vector<Spritesheet*> spritesheet_ptrs;
+		std::vector<Font*> font_ptrs;
 	};
 }

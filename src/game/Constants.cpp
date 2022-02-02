@@ -38,7 +38,31 @@ namespace PATHS {
 }
 
 namespace GRAPHICS_OBJECTS {
+	namespace IMAGES {
+	
+	}
 
+	namespace SPRITESHEETS {
+
+	}
+
+	namespace FONTS {
+
+	}
+}
+
+namespace FONTS {
+	namespace SIZE {
+		const uint8_t MAIN_FONT = 16;
+	}
+
+	namespace SCALE {
+		const uint8_t MAIN_FONT = 4;
+	}
+
+	namespace SPACING {
+		const uint8_t MAIN_FONT = 1;
+	}
 }
 
 namespace COLOURS {
@@ -102,4 +126,17 @@ namespace SPRITE {
 		0,0,0,0,0,0,13,19,11,16,19,14,0,0,28,0,
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,19
 	};
+}
+
+namespace CURVES {
+	namespace BEZIER {
+		const std::vector<Framework::vec2> TITLE_CONTROL_POINTS {
+			Framework::vec2{ 0.0f, -1.0f },
+			Framework::vec2{ 0.0f, -1.0f },
+			Framework::vec2{ 0.0f, 0.6f },
+			Framework::vec2{ 0.0f, -0.1f },
+			Framework::vec2{ 0.0f, 0.0f },
+			Framework::vec2{ 0.0f, 0.0f }
+		};
+	}
 }

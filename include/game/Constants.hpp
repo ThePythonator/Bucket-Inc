@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef FRAMEWORK_CONSTANTS_H
-#define FRAMEWORK_CONSTANTS_H
-
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -70,6 +67,28 @@ namespace GRAPHICS_OBJECTS {
 			TOTAL_SPRITESHEETS
 		};
 	}
+
+	namespace FONTS {
+		enum FONTS {
+			MAIN_FONT,
+
+			TOTAL_FONTS
+		};
+	}
+}
+
+namespace FONTS {
+	namespace SIZE {
+		extern const uint8_t MAIN_FONT;
+	}
+
+	namespace SCALE {
+		extern const uint8_t MAIN_FONT;
+	}
+
+	namespace SPACING {
+		extern const uint8_t MAIN_FONT;
+	}
 }
 
 namespace COLOURS {
@@ -126,4 +145,8 @@ namespace SPRITE {
 	extern const uint8_t PIPES[];
 }
 
-#endif
+namespace CURVES {
+	namespace BEZIER {
+		extern const std::vector<Framework::vec2> TITLE_CONTROL_POINTS;
+	}
+}

@@ -22,4 +22,9 @@ namespace Framework {
 		_delete_me = can_delete_me;
 		_next = next;
 	}
+
+	void BaseStage::init(GraphicsObjects* _graphics_objects, InputHandler* _input) {
+		graphics_objects = _graphics_objects;
+		input = _input;
+	}
 }

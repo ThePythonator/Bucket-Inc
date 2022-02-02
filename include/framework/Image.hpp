@@ -6,7 +6,6 @@
 #include "SDL_image.h"
 
 #include "Graphics.hpp"
-#include "Rect.hpp"
 
 namespace Framework {
 	class Image {

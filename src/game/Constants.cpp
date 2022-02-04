@@ -20,7 +20,13 @@ namespace WINDOW {
 }
 
 namespace STRINGS {
-
+	namespace TITLE {
+		const std::vector<std::string> BUTTONS = {
+			"Play",
+			"Settings",
+			"Quit"
+		};
+	}
 }
 
 namespace PATHS {
@@ -33,7 +39,8 @@ namespace PATHS {
 		const std::string FONT_SPRITESHEET = "font.png";
 		const std::string BACKGROUND = "background.png";
 		const std::string POPUP = "popup.png";
-		const std::string BUTTON = "button.png";
+		const std::string BUTTON_UNSELECTED = "button_unselected.png";
+		const std::string BUTTON_SELECTED = "button_selected.png";
 	}
 }
 
@@ -90,7 +97,7 @@ namespace TIMINGS {
 	namespace TITLE {
 		namespace DURATION {
 			const float FADE_IN = 1.0f;
-			//const float FADE_OUT = 1.0f;
+			const float FADE_OUT = 1.0f;
 		}
 	}
 }
@@ -139,4 +146,8 @@ namespace CURVES {
 			Framework::vec2{ 0.0f, 0.0f }
 		};
 	}
+}
+
+namespace BUTTONS {
+	const uint8_t NONE = 255;
 }

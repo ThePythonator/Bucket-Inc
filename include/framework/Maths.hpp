@@ -26,11 +26,15 @@ namespace Framework {
 	public:
 		Rect(vec2 _position = VEC_NULL, vec2 _size = VEC_NULL);
 		Rect(float x, float y, float width = 0.0f, float height = 0.0f);
-		Rect(int x, int y, int width, int height);
+		Rect(int x, int y, int width = 0, int height = 0);
+
+		vec2 centre();
 
 		vec2 position;
 		vec2 size;
 	};
+
+	extern const Rect RECT_NULL;
 
 	bool colliding(Rect a, vec2 b);
 	bool colliding(Rect a, Rect b);
@@ -48,4 +52,6 @@ namespace Framework {
 	// Get vector perpendicular to supplied vector
 	vec2 perpendicular_acw(vec2 vector);
 	vec2 perpendicular_cw(vec2 vector);
+
+	float clamp(float x, float _min, float _max);
 }

@@ -19,13 +19,13 @@ namespace Framework {
 			ALL = SDL_TEXTURE | SDL_SURFACE
 		};
 
-		Image();
+		Image(Graphics* graphics);
 
-		bool load(Graphics* graphics, std::string path, uint8_t flags = Flags::ALL);
+		bool load(std::string path, uint8_t flags = Flags::ALL);
 		void free();
 
-		void render(Graphics* graphics, Rect source_rect, Rect destination_rect);
-		void render(Graphics* graphics, Rect destination_rect);
+		void render(Rect source_rect, Rect destination_rect);
+		void render(Rect destination_rect);
 
 		SDL_Texture* get_texture();
 		SDL_Surface* get_surface();
@@ -35,6 +35,8 @@ namespace Framework {
 	private:
 		SDL_Texture* texture = nullptr;
 		SDL_Surface* surface = nullptr;
+
+		Graphics* graphics_ptr = nullptr;
 
 		uint8_t types = Flags::NONE;
 

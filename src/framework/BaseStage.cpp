@@ -5,6 +5,13 @@ namespace Framework {
 
 	}
 
+	void BaseStage::start() {
+
+	}
+	void BaseStage::end() {
+
+	}
+
 	BaseStage* BaseStage::next() {
 		return _next;
 	}
@@ -26,5 +33,8 @@ namespace Framework {
 	void BaseStage::init(GraphicsObjects* _graphics_objects, InputHandler* _input) {
 		graphics_objects = _graphics_objects;
 		input = _input;
+
+		// Let user do any setup they need, possibly with graphics_objects or input
+		start();
 	}
 }

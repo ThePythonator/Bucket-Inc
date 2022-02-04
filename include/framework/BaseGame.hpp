@@ -44,7 +44,7 @@ namespace Framework {
 		bool init();
 		void quit();
 
-		void update(float dt);
+		bool update(float dt);
 		void render();
 
 		// Main game loop

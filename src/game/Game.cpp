@@ -29,8 +29,9 @@ void Game::load_data() {
 	// Load popup image
 	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP] = Framework::create_image(graphics_objects.graphics_ptr, IMAGES_PATH + PATHS::IMAGES::POPUP, Framework::Image::Flags::SDL_TEXTURE);
 
-	// Load button image
-	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON] = Framework::create_image(graphics_objects.graphics_ptr, IMAGES_PATH + PATHS::IMAGES::BUTTON, Framework::Image::Flags::SDL_TEXTURE);
+	// Load button images
+	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON_UNSELECTED] = Framework::create_image(graphics_objects.graphics_ptr, IMAGES_PATH + PATHS::IMAGES::BUTTON_UNSELECTED, Framework::Image::Flags::SDL_TEXTURE);
+	graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON_SELECTED] = Framework::create_image(graphics_objects.graphics_ptr, IMAGES_PATH + PATHS::IMAGES::BUTTON_SELECTED, Framework::Image::Flags::SDL_TEXTURE);
 
 	// Create spritesheet from spritesheet image
 	graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET] = new Framework::Spritesheet(graphics_objects.graphics_ptr, graphics_objects.image_ptrs[GRAPHICS_OBJECTS::IMAGES::MAIN_SPRITESHEET], SPRITE::SIZE, SPRITE::SCALE);

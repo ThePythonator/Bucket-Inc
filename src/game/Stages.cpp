@@ -2,16 +2,20 @@
 
 // IntroStage
 
-IntroStage::IntroStage() : BaseStage() {
-
-}
-
-void IntroStage::update(float dt) {
+bool IntroStage::update(float dt) {
 	_intro_timer.update(dt);
 
-	if (!_intro_timer.running()) {
+	if (_intro_timer.running()) {
+		if (_intro_timer.time() > TIMINGS::INTRO::CUMULATIVE::FADE_OUT) {
+			// Switch to title
+			finish(new TitleStage());
+		}
+	}
+	else {
 		_intro_timer.start();
 	}
+
+	return true;
 }
 
 void IntroStage::render() {
@@ -39,32 +43,85 @@ void IntroStage::render() {
 	else {
 		// Black
 		graphics_objects->graphics_ptr->fill(COLOURS::BLACK);
-
-		// Switch to title
-		finish(new TitleStage());
 	}
 }
 
 // TitleStage
 
-TitleStage::TitleStage() : BaseStage() {
-	temp_x = temp_y = 0;
-	temp_b = false;
-	// TODO: need to get graphics objects somehow in order to get images
-	//Framework::Button play_button = Framework::Button(Framework::Rect(), graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON], Framework::Text(graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT], STRINGS::TITLE::PLAY, COLOURS::BLACK));
-}
+void TitleStage::start() {
+	// Create menu buttons
+	float step = WINDOW::SIZE.y * 0.15f;
+	float start = WINDOW::SIZE.y * 0.225f - step * 2;
 
-void TitleStage::update(float dt) {
-	_transition_timer.update(dt);
+	Framework::vec2 scaled_size = graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON_UNSELECTED]->get_size() * SPRITE::UI_SCALE;
+	Framework::vec2 offset = Framework::vec2{ 0.0f, start };
 
-	if (!_transition_timer.running()) {
-		_transition_timer.start();
+	Framework::Button::ButtonImages button_images {
+		graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON_UNSELECTED],
+		graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON_SELECTED]
+	};
+
+	for (uint8_t i = 0; i < BUTTONS::TITLE::TOTAL; i++) {
+		Framework::Rect render_rect = Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset, scaled_size);
+		Framework::Rect collider_rect = Framework::Rect(render_rect.position + SPRITE::UI_SCALE, scaled_size - 2 * SPRITE::UI_SCALE);
+
+		button_positions.push_back(render_rect.position);
+
+		Framework::Text text = Framework::Text(graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT], STRINGS::TITLE::BUTTONS[i], COLOURS::BLACK);
+		
+		buttons.push_back(Framework::Button(render_rect, collider_rect, button_images, text, i));
+
+		offset.y += step;
 	}
 
-	//printf("%f, %f\n", input.mouse_position().x, input.mouse_position().y);
-	temp_x = input->mouse_position().x;
-	temp_y = input->mouse_position().y;
-	temp_b = input->is_down(Framework::MouseHandler::MouseButton::LEFT);
+	// Start timer
+	_transition_timer.start();
+}
+
+void TitleStage::end() {
+	// Delete any pointers we're done with
+	for (Framework::Text* text_ptr : text_ptrs) {
+		delete text_ptr;
+	}
+	text_ptrs.clear();
+}
+
+bool TitleStage::update(float dt) {
+	_transition_timer.update(dt);
+
+	// Update buttons
+	for (Framework::Button& button : buttons) {
+		button.update(input);
+
+		if (button.pressed() && _button_selected == BUTTONS::NONE) {
+			_button_selected = button.get_id();
+			_transition_timer.reset();
+			_transition_timer.start();
+
+			if (_button_selected == BUTTONS::TITLE::QUIT) {
+				// Returning false causes program to exit
+				return false;
+			}
+		}
+	}
+
+	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TIMINGS::TITLE::DURATION::FADE_OUT) {
+		// Next stage!
+		switch (_button_selected) {
+		case BUTTONS::TITLE::PLAY:
+			finish(new GameStage());
+			break;
+
+		case BUTTONS::TITLE::SETTINGS:
+			finish(new SettingsStage());
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	return true;
 }
 
 void TitleStage::render() {
@@ -72,7 +129,7 @@ void TitleStage::render() {
 
 	// Render background artwork
 	// Empty rect means 0,0,w,h
-	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BACKGROUND]->render(graphics_objects->graphics_ptr, Framework::Rect(Framework::VEC_NULL, WINDOW::SIZE));
+	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BACKGROUND]->render(Framework::Rect(Framework::VEC_NULL, WINDOW::SIZE));
 
 	// Render pipes
 	for (uint8_t i = 0; i < SPRITE::PIPES_ARRAY_SIZE; i++) {
@@ -104,42 +161,36 @@ void TitleStage::render() {
 	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
 
 	// Calculate offset used for animating menu options
-	// TODO: animate (bezier?)
-	float t = _transition_timer.time() * 0.8f;
-	Framework::vec2 offset = t < 1.0f ? Framework::Curves::bezier(CURVES::BEZIER::TITLE_CONTROL_POINTS, t) * WINDOW::SIZE : Framework::VEC_NULL;
-	//Framework::vec2 offset = Framework::Curves::bezier(std::vector<Framework::vec2>{Framework::VEC_NULL, Framework::vec2{ 100.0f, 50.0f }, Framework::vec2{ 50.0f, 200.0f }, Framework::vec2{ 100.0f, 50.0f }}, _transition_timer.time() / 3.0f);
-
+	float t = Framework::clamp(_transition_timer.time(), 0.0f, 1.0f);
+	if (_button_selected != BUTTONS::NONE) {
+		// Reverse animation
+		t = 1.0f - t;
+	}
+	Framework::vec2 offset = Framework::Curves::bezier(CURVES::BEZIER::TITLE_CONTROL_POINTS, t) * WINDOW::SIZE;// : Framework::VEC_NULL;
+	
 	// Render background for options
-	Framework::vec2 scaled_size = graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->get_size() * SPRITE::UI_SCALE;
-	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->render(graphics_objects->graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset, scaled_size));
+	Framework::vec2 scaled_popup_size = graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->get_size() * SPRITE::UI_SCALE;
+	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->render(Framework::Rect(WINDOW::SIZE_HALF - scaled_popup_size / 2 + offset, scaled_popup_size));
 
-	// need text and font stuff
-	// need button class
-	// Render PLAY
-	// Render SETTINGS
-	// Render QUIT
+	// Shift button positions so they're animated too
+	// Render buttons
+	for (uint8_t i = 0; i < buttons.size(); i++) {
+		buttons[i].set_position(button_positions[i] + offset);
+		buttons[i].render();
+	}
 
-	// temp for now, just demoing button image
-
-	scaled_size = graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->get_size() * SPRITE::UI_SCALE;
-	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->render(graphics_objects->graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset - Framework::vec2{ 0.0f, 100.0f }, scaled_size));
-	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->render(graphics_objects->graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset, scaled_size));
-	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::BUTTON]->render(graphics_objects->graphics_ptr, Framework::Rect(WINDOW::SIZE_HALF - scaled_size / 2 + offset + Framework::vec2{ 0.0f, 100.0f }, scaled_size));
-
-
-	// Test text rendering
-	//graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT]->render_text("QUIT", Framework::vec2{ 5.0f, 5.0f }, COLOURS::BLACK);
-	graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT]->render_text("Settings", (WINDOW::SIZE_HALF + offset) / FONTS::SCALE::MAIN_FONT, COLOURS::BLACK, Framework::Font::CENTER_CENTER);
-	//graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::FONT_SPRITESHEET]->rect(Framework::Rect(128, 16, 16, 16), 10, 10, 4);
-	//graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::FONT_SPRITESHEET]->render(graphics_objects->graphics_ptr, Framework::Rect());
-
-
-	Framework::SDLUtils::SDL_SetRenderDrawColor(graphics_objects->graphics_ptr->get_renderer(), COLOURS::BLACK);
-	if (temp_b) Framework::SDLUtils::SDL_RenderDrawCircle(graphics_objects->graphics_ptr->get_renderer(), temp_x, temp_y, 10);
-
-	if (_transition_timer.time() < TIMINGS::TITLE::DURATION::FADE_IN) {
+	if (_button_selected == BUTTONS::NONE && _transition_timer.time() < TIMINGS::TITLE::DURATION::FADE_IN) {
 		// Fade in
 		graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, _transition_timer.time() / TIMINGS::TITLE::DURATION::FADE_IN));
+	}
+	else if (_button_selected != BUTTONS::NONE) {
+		if (_transition_timer.time() < TIMINGS::TITLE::DURATION::FADE_OUT) {
+			// Fade out
+			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0x00, 0xFF, _transition_timer.time() / TIMINGS::TITLE::DURATION::FADE_OUT));
+		}
+		else {
+			graphics_objects->graphics_ptr->fill(COLOURS::BLACK);
+		}
 	}
 } 
 
@@ -149,8 +200,8 @@ SettingsStage::SettingsStage() : BaseStage() {
 
 }
 
-void SettingsStage::update(float dt) {
-
+bool SettingsStage::update(float dt) {
+	return true;
 }
 
 void SettingsStage::render() {
@@ -163,9 +214,11 @@ GameStage::GameStage() : BaseStage() {
 
 }
 
-void GameStage::update(float dt) {
+bool GameStage::update(float dt) {
 	// Note: if pausing game, call
 	// finish(new PausedStage(this), false);
+
+	return true;
 }
 
 void GameStage::render() {
@@ -179,11 +232,13 @@ PausedStage::PausedStage(BaseStage* background_stage) : BaseStage() {
 	_background_stage = background_stage;
 }
 
-void PausedStage::update(float dt) {
+bool PausedStage::update(float dt) {
 	if (false) {
 		// Exit pause
 		finish(_background_stage);
 	}
+
+	return true;
 }
 
 void PausedStage::render() {

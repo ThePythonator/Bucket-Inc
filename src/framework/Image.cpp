@@ -1,11 +1,11 @@
 #include "Image.hpp"
 
 namespace Framework {
-	Image::Image() {
-
+	Image::Image(Graphics* graphics) {
+		graphics_ptr = graphics;
 	}
 
-	bool Image::load(Graphics* graphics, std::string path, uint8_t flags) {
+	bool Image::load(std::string path, uint8_t flags) {
 		// Load image at specified path
 		SDL_Surface* temp_surface = IMG_Load(path.c_str());
 
@@ -20,7 +20,7 @@ namespace Framework {
 		_h = temp_surface->h;
 
 		// Create texture from image
-		SDL_Texture* temp_texture = SDL_CreateTextureFromSurface(graphics->get_renderer(), temp_surface);
+		SDL_Texture* temp_texture = SDL_CreateTextureFromSurface(graphics_ptr->get_renderer(), temp_surface);
 
 		if (temp_texture == NULL)
 		{
@@ -64,7 +64,7 @@ namespace Framework {
 		}
 	}
 
-	void Image::render(Graphics* graphics, Rect source_rect, Rect destination_rect) {
+	void Image::render(Rect source_rect, Rect destination_rect) {
 		if (source_rect.size == vec2{ 0.0f, 0.0f }) {
 			source_rect.size = get_size();
 		}
@@ -73,11 +73,11 @@ namespace Framework {
 		}
 
 		// Render from texture to screen
-		SDL_RenderCopy(graphics->get_renderer(), texture, &SDLUtils::get_sdl_rect(source_rect), &SDLUtils::get_sdl_rect(destination_rect));
+		SDL_RenderCopy(graphics_ptr->get_renderer(), texture, &SDLUtils::get_sdl_rect(source_rect), &SDLUtils::get_sdl_rect(destination_rect));
 	}
 
-	void Image::render(Graphics* graphics, Rect destination_rect) {
-		render(graphics, VEC_NULL, destination_rect);
+	void Image::render(Rect destination_rect) {
+		render(RECT_NULL, destination_rect);
 	}
 
 	// Returns SDL_Texture* if loaded, otherwise returns nullptr
@@ -95,8 +95,8 @@ namespace Framework {
 	}
 
 	Image* create_image(Graphics* graphics, std::string path, uint8_t flags) {
-		Image* image_ptr = new Image();
-		image_ptr->load(graphics, path, flags);
+		Image* image_ptr = new Image(graphics);
+		image_ptr->load(path, flags);
 		return image_ptr;
 	}
 }

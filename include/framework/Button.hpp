@@ -2,7 +2,7 @@
 
 #include "Image.hpp"
 #include "Font.hpp"
-#include "Mouse.hpp"
+#include "Input.hpp"
 
 namespace Framework {
 	class Button {
@@ -14,22 +14,32 @@ namespace Framework {
 			JUST_PRESSED // Button has been pressed that frame
 		};
 
+		struct ButtonImages {
+			Image* unselected = nullptr;
+			Image* selected = nullptr;
+		};
+
 		Button();
-		Button(Rect rect, Image* image, Text* text);
+		Button(Rect rect, ButtonImages images, Text text, uint8_t id = 0);
+		Button(Rect render_rect, Rect collider_rect, ButtonImages images, Text text, uint8_t id = 0);
 
 		ButtonState state();
 		bool pressed();
 
-		void update(MouseHandler::Mouse* mouse);
-		void render(Graphics* graphics);
+		void update(InputHandler* input);
+		void render();
+
+		void set_position(vec2 position);
+
+		uint8_t get_id();
 
 	private:
 		ButtonState _state = ButtonState::STILL_UP;
 
-		Rect _rect;
-		Image* _image_ptr = nullptr;
-		Text* _text_ptr = nullptr;
+		Rect _render_rect, _collider_rect;
+		ButtonImages _images;
+		Text _text;
 
-		// Add ID attribute??
+		uint8_t _id = 0;
 	};
 }

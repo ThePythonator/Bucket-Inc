@@ -28,7 +28,9 @@ namespace WINDOW {
 }
 
 namespace STRINGS {
-
+	namespace TITLE {
+		extern const std::vector<std::string> BUTTONS;
+	}
 }
 
 namespace PATHS {
@@ -41,7 +43,8 @@ namespace PATHS {
 		extern const std::string FONT_SPRITESHEET;
 		extern const std::string BACKGROUND;
 		extern const std::string POPUP;
-		extern const std::string BUTTON;
+		extern const std::string BUTTON_UNSELECTED;
+		extern const std::string BUTTON_SELECTED;
 	}
 }
 
@@ -53,7 +56,8 @@ namespace GRAPHICS_OBJECTS {
 			FONT_SPRITESHEET,
 			BACKGROUND,
 			POPUP,
-			BUTTON,
+			BUTTON_UNSELECTED,
+			BUTTON_SELECTED,
 
 			TOTAL_IMAGES
 		};
@@ -116,7 +120,7 @@ namespace TIMINGS {
 	namespace TITLE {
 		namespace DURATION {
 			extern const float FADE_IN;
-			//extern const float FADE_OUT;
+			extern const float FADE_OUT;
 		}
 	}
 }
@@ -148,5 +152,19 @@ namespace SPRITE {
 namespace CURVES {
 	namespace BEZIER {
 		extern const std::vector<Framework::vec2> TITLE_CONTROL_POINTS;
+	}
+}
+
+namespace BUTTONS {
+	extern const uint8_t NONE;
+
+	namespace TITLE {
+		enum TITLE {
+			PLAY,
+			SETTINGS,
+			QUIT,
+
+			TOTAL
+		};
 	}
 }

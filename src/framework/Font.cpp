@@ -108,7 +108,7 @@ namespace Framework {
 	}
 
 	void Font::render_text(std::string text, vec2 position, Colour colour, AnchorPosition anchor_position) {
-		vec2 current_position = position;
+		vec2 current_position = position / font_spritesheet_ptr->get_scale();
 		vec2 size;
 
 		size.y = font_spritesheet_ptr->get_sprite_size();

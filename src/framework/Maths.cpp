@@ -5,6 +5,7 @@ namespace Framework {
 	//const float EPSILON = 0.0001f; // todo: check if reasonable
 
 	const vec2 VEC_NULL = vec2{ 0.0f, 0.0f };
+	const Rect RECT_NULL = Rect(VEC_NULL, VEC_NULL);
 
 	// Rect and collision detection
 
@@ -21,6 +22,10 @@ namespace Framework {
 	Rect::Rect(int x, int y, int width, int height) {
 		position = vec2{ static_cast<float>(x), static_cast<float>(y) };
 		size = vec2{ static_cast<float>(width), static_cast<float>(height) };
+	}
+
+	vec2 Rect::centre() {
+		return position + size / 2;
 	}
 
 	bool colliding(Rect a, vec2 b) {
@@ -62,5 +67,9 @@ namespace Framework {
 
 	vec2 perpendicular_cw(vec2 vector) {
 		return vec2{ vector.y, -vector.x };
+	}
+
+	float clamp(float x, float _min, float _max) {
+		return std::min(_max, std::max(_min, x));
 	}
 }

@@ -66,7 +66,7 @@ namespace Framework {
 	void Spritesheet::rect(Rect src, float x, float y, float scale, SpriteTransform transform) {
 		// TODO: handle transforms
 		Rect dst = Rect(_scale_positions ? x * scale : x, _scale_positions ? y * scale : y, src.size.x * scale, src.size.y * scale);
-		_spritesheet_image->render(_graphics, src, dst);
+		_spritesheet_image->render(src, dst);
 	}
 
 	void Spritesheet::rect(Rect src, vec2 position, float scale, float angle, vec2 centre, SpriteTransform transform) {
@@ -76,7 +76,7 @@ namespace Framework {
 		// TODO: handle transforms
 		// TODO: handle rotations
 		Rect dst = Rect(_scale_positions ? x * scale : x, _scale_positions ? y * scale : y, src.size.x * scale, src.size.y * scale);
-		_spritesheet_image->render(_graphics, src, dst);
+		_spritesheet_image->render(src, dst);
 	}
 
 	uint8_t Spritesheet::get_sprite_size() {

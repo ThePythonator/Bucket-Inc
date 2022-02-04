@@ -9,7 +9,10 @@ namespace Framework {
 	public:
 		BaseStage();
 
-		virtual void update(float dt) = 0;
+		virtual void start();
+		virtual void end();
+
+		virtual bool update(float dt) = 0;
 		virtual void render() = 0;
 
 		BaseStage* next();

@@ -66,7 +66,7 @@ namespace Framework {
 			}
 		}
 
-		update(dt);
+		bool running = update(dt);
 
 		// Clear the screen
 		/*SDLUtils::SDL_SetRenderDrawColor(renderer, COLOURS::BLACK);
@@ -89,11 +89,14 @@ namespace Framework {
 
 		//printf("FPS: %f\n", 1.0f / dt);
 
-		return true;
+		return running;
 	}
 
-	void BaseGame::update(float dt) {
+	bool BaseGame::update(float dt) {
 		if (stage->finished()) {
+			// Allow user to clear up anything
+			stage->end();
+
 			if (stage->delete_me()) {
 				BaseStage* temp_stage = stage->next();
 				delete stage;
@@ -102,9 +105,13 @@ namespace Framework {
 			else {
 				stage = stage->next();
 			}
+			
+			// Setup next stage
 			stage->init(&graphics_objects, &input);
 		}
-		stage->update(dt);
+
+		bool running = stage->update(dt);
+		return running;
 	}
 
 	void BaseGame::render() {

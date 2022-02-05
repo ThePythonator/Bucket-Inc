@@ -27,6 +27,14 @@ namespace STRINGS {
 			"Quit"
 		};
 	}
+
+	namespace SETTINGS {
+		const std::vector<std::string> BUTTONS = {
+			"Sound",
+			"Music",
+			"Back"
+		};
+	}
 }
 
 namespace PATHS {
@@ -78,6 +86,8 @@ namespace COLOURS {
 }
 
 namespace TIMINGS {
+	const float BEZIER_TIMER_SCALE = 0.8f;
+
 	namespace INTRO {
 		namespace DURATION {
 			const float INITIAL_DELAY = 1.0f;
@@ -94,7 +104,7 @@ namespace TIMINGS {
 		}
 	}
 
-	namespace TITLE {
+	namespace MENU {
 		namespace DURATION {
 			const float FADE_IN = 1.0f;
 			const float FADE_OUT = 1.0f;

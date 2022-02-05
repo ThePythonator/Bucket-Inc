@@ -31,6 +31,10 @@ namespace STRINGS {
 	namespace TITLE {
 		extern const std::vector<std::string> BUTTONS;
 	}
+
+	namespace SETTINGS {
+		extern const std::vector<std::string> BUTTONS;
+	}
 }
 
 namespace PATHS {
@@ -101,6 +105,8 @@ namespace COLOURS {
 }
 
 namespace TIMINGS {
+	extern const float BEZIER_TIMER_SCALE;
+
 	namespace INTRO {
 		namespace DURATION {
 			extern const float INITIAL_DELAY;
@@ -117,7 +123,7 @@ namespace TIMINGS {
 		}
 	}
 
-	namespace TITLE {
+	namespace MENU {
 		namespace DURATION {
 			extern const float FADE_IN;
 			extern const float FADE_OUT;
@@ -163,6 +169,16 @@ namespace BUTTONS {
 			PLAY,
 			SETTINGS,
 			QUIT,
+
+			TOTAL
+		};
+	}
+
+	namespace SETTINGS {
+		enum SETTINGS {
+			SOUND,
+			MUSIC,
+			BACK,
 
 			TOTAL
 		};

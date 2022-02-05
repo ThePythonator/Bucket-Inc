@@ -18,6 +18,10 @@ set(GAME_SOURCES
 	"Application.cpp"
 	"Game.cpp"
 
+	"GameUtilities.cpp"
+
+	"CrackedPipe.cpp"
+
 	"Stages.cpp"
 
 	"Constants.cpp"

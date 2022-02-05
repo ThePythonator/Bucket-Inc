@@ -7,6 +7,8 @@
 #include "Timer.hpp"
 #include "Curves.hpp"
 
+#include "GameUtilities.hpp"
+
 class IntroStage : public Framework::BaseStage {
 public:
 	bool update(float dt);
@@ -26,19 +28,22 @@ public:
 
 private:
 	Framework::Timer _transition_timer;
-	
-	std::vector<Framework::Text*> text_ptrs;
-	std::vector<Framework::vec2> button_positions;
 
 	uint8_t _button_selected = BUTTONS::NONE;
 };
 
 class SettingsStage : public Framework::BaseStage {
 public:
-	SettingsStage();
+	void start();
+	void end();
 
 	bool update(float dt);
 	void render();
+
+private:
+	Framework::Timer _transition_timer;
+
+	uint8_t _button_selected = BUTTONS::NONE;
 };
 
 class GameStage : public Framework::BaseStage {

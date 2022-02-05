@@ -24,7 +24,11 @@ namespace Framework {
 		Button(Rect render_rect, Rect collider_rect, ButtonImages images, Text text, uint8_t id = 0);
 
 		ButtonState state();
+
+		// Pressed means 'just pressed' - i.e., clicked this frame
 		bool pressed();
+		// Down means 'held down' - i.e. might have been clicked this frame, or might not
+		bool down();
 
 		void update(InputHandler* input);
 		void render();
@@ -33,12 +37,16 @@ namespace Framework {
 
 		uint8_t get_id();
 
+		vec2 initial_position();
+
 	private:
 		ButtonState _state = ButtonState::STILL_UP;
 
 		Rect _render_rect, _collider_rect;
 		ButtonImages _images;
 		Text _text;
+
+		vec2 _initial_position;
 
 		uint8_t _id = 0;
 	};

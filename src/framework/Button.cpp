@@ -58,7 +58,7 @@ namespace Framework {
 		}*/
 
 		// THIS VERSION RELEASES WHEN CURSOR MOVES OFF IT
-		if (colliding(_collider_rect, input->mouse_position())) {
+		if (colliding(_collider_rect, input->get_mouse()->position())) {
 			if (input->just_up(MouseHandler::MouseButton::LEFT)) {
 				_state = ButtonState::JUST_RELEASED;
 			}

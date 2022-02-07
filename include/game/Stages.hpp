@@ -21,7 +21,6 @@ private:
 class TitleStage : public Framework::BaseStage {
 public:
 	void start();
-	void end();
 
 	bool update(float dt);
 	void render();
@@ -35,7 +34,6 @@ private:
 class SettingsStage : public Framework::BaseStage {
 public:
 	void start();
-	void end();
 
 	bool update(float dt);
 	void render();
@@ -62,9 +60,13 @@ class PausedStage : public Framework::BaseStage {
 public:
 	PausedStage(BaseStage* background_stage);
 
+	void start();
+
 	bool update(float dt);
 	void render();
 
 private:
+	Framework::Timer _transition_timer;
+
 	BaseStage* _background_stage;
 };

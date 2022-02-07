@@ -146,6 +146,10 @@ namespace SPRITE {
 		extern const uint8_t PIPE_HORIZONTAL;
 	}
 
+	namespace RECT {
+		extern const Framework::Rect BUCKET_RECT;
+	}
+
 	extern const uint8_t PIPES_ARRAY_WIDTH;
 	extern const uint8_t PIPES_ARRAY_HEIGHT;
 	extern const uint8_t PIPES_ARRAY_SIZE;

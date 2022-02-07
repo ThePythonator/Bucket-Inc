@@ -58,7 +58,7 @@ namespace Framework {
 		return button_state == MouseHandler::MouseButtonState::JUST_PRESSED;
 	}
 
-	vec2 InputHandler::mouse_position() {
-		return mouse.position();
+	MouseHandler::Mouse* InputHandler::get_mouse() {
+		return &mouse;
 	}
 }

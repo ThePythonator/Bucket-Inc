@@ -55,10 +55,6 @@ void TitleStage::start() {
 	_transition_timer.start();
 }
 
-void TitleStage::end() {
-
-}
-
 bool TitleStage::update(float dt) {
 	_transition_timer.update(dt);
 
@@ -108,10 +104,6 @@ void SettingsStage::start() {
 
 	// Start timer
 	_transition_timer.start();
-}
-
-void SettingsStage::end() {
-
 }
 
 bool SettingsStage::update(float dt) {
@@ -165,6 +157,12 @@ void SettingsStage::render() {
 // GameStage
 
 void GameStage::start() {
+	// Hide cursor
+	//input->get_mouse()->set_cursor(false);
+	//SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
+	//SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO));
+	//SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT));
+
 	//buttons = setup_menu_buttons(graphics_objects, STRINGS::SETTINGS::BUTTONS);
 
 	// Start timer
@@ -172,7 +170,8 @@ void GameStage::start() {
 }
 
 void GameStage::end() {
-
+	// Un-hide cursor
+	input->get_mouse()->set_cursor(true);
 }
 
 bool GameStage::update(float dt) {
@@ -181,7 +180,7 @@ bool GameStage::update(float dt) {
 	if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
 		// User has paused
 		// Pass this stage to PausedStage so that it still renders in the background
-		finish(new PausedStage(this), false);
+		finish(new PausedStage(this), false); // NOTE: WE NEED TRANSITIONS!
 	}
 
 	return true;
@@ -190,7 +189,13 @@ bool GameStage::update(float dt) {
 void GameStage::render() {
 	render_background_scene(graphics_objects); //, cracked_pipes
 
+	// Render bucket
+	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BUCKET_RECT, input->get_mouse()->position() / SPRITE::SCALE - SPRITE::RECT::BUCKET_RECT.size / 2);
+
 	handle_fade(graphics_objects, _transition_timer, FadeState::IN); // todo : get correct fade state
+
+	// when fading to paused menu:
+	// handle_fade(graphics_objects, _transition_timer, FadeState::OUT, 0x00, 0x7F); // todo: get FadeState
 }
 
 // PausedStage
@@ -200,10 +205,21 @@ PausedStage::PausedStage(BaseStage* background_stage) : BaseStage() {
 	_background_stage = background_stage;
 }
 
+void PausedStage::start() {
+	//buttons = setup_menu_buttons(graphics_objects, STRINGS::SETTINGS::BUTTONS);
+
+	// Start timer
+	_transition_timer.start();
+}
+
 bool PausedStage::update(float dt) {
-	if (false) {
+	_transition_timer.update(dt);
+
+	if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
 		// Exit pause
 		finish(_background_stage);
+		// TODO: animation
+		// TODO: button to return
 	}
 
 	return true;
@@ -214,7 +230,7 @@ void PausedStage::render() {
 	_background_stage->render();
 
 	// Fade out background graphics slightly
-	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
+	handle_fade(graphics_objects, _transition_timer, FadeState::IN, 0x00, 0x7F); // todo: get FadeState
 
-	// TODO: pause menu
+	render_popup_and_buttons(graphics_objects, _transition_timer, buttons, FadeState::IN); // todo: work out fade state
 }

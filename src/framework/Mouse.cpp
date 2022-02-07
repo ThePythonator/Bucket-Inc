@@ -54,5 +54,9 @@ namespace Framework {
 				}
 			}
 		}
+
+		void Mouse::set_cursor(bool visible) {
+			SDL_ShowCursor(visible ? SDL_ENABLE : SDL_DISABLE);
+		}
 	}
 }

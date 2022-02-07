@@ -127,6 +127,10 @@ namespace SPRITE {
 		const uint8_t PIPE_HORIZONTAL = 2;
 	}
 
+	namespace RECT {
+		const Framework::Rect BUCKET_RECT = Framework::Rect(0, 0, SIZE * 2, SIZE * 3);
+	}
+
 	const uint8_t PIPES_ARRAY_WIDTH = 16;
 	const uint8_t PIPES_ARRAY_HEIGHT = 5;
 	const uint8_t PIPES_ARRAY_SIZE = PIPES_ARRAY_WIDTH * PIPES_ARRAY_HEIGHT;

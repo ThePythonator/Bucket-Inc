@@ -41,6 +41,8 @@ namespace Framework {
 			void update();
 			void update_mouse(const SDL_Event& sdl_event);
 
+			void set_cursor(bool visible);
+
 		private:
 			vec2 _position;
 			MouseButtonUnion _buttons;

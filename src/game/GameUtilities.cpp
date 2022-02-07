@@ -45,15 +45,10 @@ void render_background_scene(Framework::GraphicsObjects* graphics_objects, std::
 	// TODO
 }
 
-void render_menu(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, std::vector<Framework::Button> buttons, uint8_t button_selected) {
-	render_background_scene(graphics_objects);
-
-	// Fade out background graphics slightly
-	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
-
+void render_popup_and_buttons(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, std::vector<Framework::Button> buttons, FadeState state) {
 	// Calculate offset used for animating menu options
 	float t = Framework::clamp(transition_timer.time() / TIMINGS::MENU::DURATION::FADE, 0.0f, 1.0f);
-	if (button_selected != BUTTONS::NONE) {
+	if (state == FadeState::OUT) {
 		// Reverse animation
 		t = 1.0f - t;
 	}
@@ -69,11 +64,20 @@ void render_menu(Framework::GraphicsObjects* graphics_objects, Framework::Timer&
 		buttons[i].set_position(buttons[i].initial_position() + offset);
 		buttons[i].render();
 	}
+}
+
+void render_menu(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, std::vector<Framework::Button> buttons, uint8_t button_selected) {
+	render_background_scene(graphics_objects);
+
+	// Fade out background graphics slightly
+	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
+
+	render_popup_and_buttons(graphics_objects, transition_timer, buttons, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
 
 	handle_fade(graphics_objects, transition_timer, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
 }
 
-void handle_fade(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, FadeState state) {
+void handle_fade(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, FadeState state, uint8_t low, uint8_t high) {
 	// Handle fading
 	if (state == FadeState::IN) {
 		if (transition_timer.time() < TIMINGS::MENU::DURATION::FADE) {

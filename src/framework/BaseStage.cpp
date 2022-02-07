@@ -34,6 +34,13 @@ namespace Framework {
 		graphics_objects = _graphics_objects;
 		input = _input;
 
+		// We need to reset these in case we're reusing a stage
+		buttons.clear();
+
+		_finished = false;
+		_delete_me = false;
+		_next = nullptr;
+
 		// Let user do any setup they need, possibly with graphics_objects or input
 		start();
 	}

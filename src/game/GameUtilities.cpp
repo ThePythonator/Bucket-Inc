@@ -52,7 +52,7 @@ void render_menu(Framework::GraphicsObjects* graphics_objects, Framework::Timer&
 	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
 
 	// Calculate offset used for animating menu options
-	float t = Framework::clamp(transition_timer.time() * TIMINGS::BEZIER_TIMER_SCALE, 0.0f, 1.0f);
+	float t = Framework::clamp(transition_timer.time() / TIMINGS::MENU::DURATION::FADE, 0.0f, 1.0f);
 	if (button_selected != BUTTONS::NONE) {
 		// Reverse animation
 		t = 1.0f - t;
@@ -70,15 +70,21 @@ void render_menu(Framework::GraphicsObjects* graphics_objects, Framework::Timer&
 		buttons[i].render();
 	}
 
+	handle_fade(graphics_objects, transition_timer, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
+}
+
+void handle_fade(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, FadeState state) {
 	// Handle fading
-	if (button_selected == BUTTONS::NONE && transition_timer.time() < TIMINGS::MENU::DURATION::FADE_IN) {
-		// Fade in
-		graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, transition_timer.time() / TIMINGS::MENU::DURATION::FADE_IN));
+	if (state == FadeState::IN) {
+		if (transition_timer.time() < TIMINGS::MENU::DURATION::FADE) {
+			// Fade in
+			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, transition_timer.time() / TIMINGS::MENU::DURATION::FADE));
+		}
 	}
-	else if (button_selected != BUTTONS::NONE) {
-		if (transition_timer.time() < TIMINGS::MENU::DURATION::FADE_OUT) {
+	else if (state == FadeState::OUT) {
+		if (transition_timer.time() < TIMINGS::MENU::DURATION::FADE) {
 			// Fade out
-			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0x00, 0xFF, transition_timer.time() / TIMINGS::MENU::DURATION::FADE_OUT));
+			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0x00, 0xFF, transition_timer.time() / TIMINGS::MENU::DURATION::FADE));
 		}
 		else {
 			graphics_objects->graphics_ptr->fill(COLOURS::BLACK);

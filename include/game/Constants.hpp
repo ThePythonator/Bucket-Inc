@@ -105,8 +105,6 @@ namespace COLOURS {
 }
 
 namespace TIMINGS {
-	extern const float BEZIER_TIMER_SCALE;
-
 	namespace INTRO {
 		namespace DURATION {
 			extern const float INITIAL_DELAY;
@@ -125,8 +123,7 @@ namespace TIMINGS {
 
 	namespace MENU {
 		namespace DURATION {
-			extern const float FADE_IN;
-			extern const float FADE_OUT;
+			extern const float FADE;
 		}
 	}
 }

@@ -48,10 +48,14 @@ private:
 
 class GameStage : public Framework::BaseStage {
 public:
-	GameStage();
+	void start();
+	void end();
 
 	bool update(float dt);
 	void render();
+
+private:
+	Framework::Timer _transition_timer;
 };
 
 class PausedStage : public Framework::BaseStage {

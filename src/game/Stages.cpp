@@ -66,19 +66,14 @@ bool TitleStage::update(float dt) {
 	for (Framework::Button& button : buttons) {
 		button.update(input);
 
-		if (button.pressed() && _button_selected == BUTTONS::NONE) {
+		if (button.pressed() && _button_selected == BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
 			_button_selected = button.get_id();
 			_transition_timer.reset();
 			_transition_timer.start();
-
-			if (_button_selected == BUTTONS::TITLE::QUIT) {
-				// Returning false causes program to exit
-				return false;
-			}
 		}
 	}
 
-	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE_OUT) {
+	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
 		// Next stage!
 		switch (_button_selected) {
 		case BUTTONS::TITLE::PLAY:
@@ -88,6 +83,11 @@ bool TitleStage::update(float dt) {
 		case BUTTONS::TITLE::SETTINGS:
 			finish(new SettingsStage());
 			break;
+
+		case BUTTONS::TITLE::QUIT:
+			// Returning false causes program to exit
+			return false;
+			// (so we don't need the break)
 
 		default:
 			break;
@@ -121,7 +121,7 @@ bool SettingsStage::update(float dt) {
 	for (Framework::Button& button : buttons) {
 		button.update(input);
 
-		if (button.pressed() && _button_selected == BUTTONS::NONE) {
+		if (button.pressed() && _button_selected == BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
 			_button_selected = button.get_id();
 
 			if (_button_selected == BUTTONS::SETTINGS::BACK) {
@@ -131,7 +131,7 @@ bool SettingsStage::update(float dt) {
 		}
 	}
 
-	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE_OUT) {
+	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
 		// Next stage!
 		switch (_button_selected) {
 		case BUTTONS::SETTINGS::SOUND:
@@ -164,19 +164,33 @@ void SettingsStage::render() {
 
 // GameStage
 
-GameStage::GameStage() : BaseStage() {
+void GameStage::start() {
+	//buttons = setup_menu_buttons(graphics_objects, STRINGS::SETTINGS::BUTTONS);
+
+	// Start timer
+	_transition_timer.start();
+}
+
+void GameStage::end() {
 
 }
 
 bool GameStage::update(float dt) {
-	// Note: if pausing game, call
-	// finish(new PausedStage(this), false);
+	_transition_timer.update(dt);
+
+	if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
+		// User has paused
+		// Pass this stage to PausedStage so that it still renders in the background
+		finish(new PausedStage(this), false);
+	}
 
 	return true;
 }
 
 void GameStage::render() {
+	render_background_scene(graphics_objects); //, cracked_pipes
 
+	handle_fade(graphics_objects, _transition_timer, FadeState::IN); // todo : get correct fade state
 }
 
 // PausedStage
@@ -198,4 +212,9 @@ bool PausedStage::update(float dt) {
 void PausedStage::render() {
 	// Render background stage
 	_background_stage->render();
+
+	// Fade out background graphics slightly
+	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
+
+	// TODO: pause menu
 }

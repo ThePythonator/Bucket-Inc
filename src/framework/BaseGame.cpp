@@ -131,6 +131,7 @@ namespace Framework {
 		graphics_objects.image_ptrs = std::vector<Framework::Image*>(GRAPHICS_OBJECTS::IMAGES::TOTAL_IMAGES);
 		graphics_objects.spritesheet_ptrs = std::vector<Framework::Spritesheet*>(GRAPHICS_OBJECTS::SPRITESHEETS::TOTAL_SPRITESHEETS);
 		graphics_objects.font_ptrs = std::vector<Framework::Font*>(GRAPHICS_OBJECTS::FONTS::TOTAL_FONTS);
+		graphics_objects.transition_ptrs = std::vector<Framework::BaseTransition*>(GRAPHICS_OBJECTS::TRANSITIONS::TOTAL_TRANSITIONS);
 
 		// Load game data
 		load_data();

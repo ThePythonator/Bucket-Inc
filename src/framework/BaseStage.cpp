@@ -48,4 +48,11 @@ namespace Framework {
 	void BaseStage::set_transition(BaseTransition* _transition) {
 		transition = _transition;
 	}
+
+	void BaseStage::clear_transition() {
+		if (transition != nullptr) {
+			delete transition;
+			transition = nullptr;
+		}
+	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GraphicsObjects.hpp"
+#include "Graphics.hpp"
 #include "Timer.hpp"
 
 namespace Framework {
@@ -16,7 +16,7 @@ namespace Framework {
 		BaseTransition();
 
 		virtual void update(float dt) = 0;
-		virtual void render(GraphicsObjects* graphics_objects) = 0;
+		virtual void render(Graphics* graphics) = 0;
 
 		// Return the percentage completion of the current transition (from 0 to 1)
 		virtual float percent() = 0;

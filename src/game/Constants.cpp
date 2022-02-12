@@ -105,7 +105,8 @@ namespace TIMINGS {
 
 namespace TRANSITIONS {
 	const float FADE_TIME = 1.2f;
-	uint8_t PAUSE_TRANSITIONS_MAX = 0x7F;
+	const float PAUSE_FADE_TIME = 0.6f;
+	uint8_t PAUSE_ALPHA = 0x9F;
 }
 
 namespace SPRITE {

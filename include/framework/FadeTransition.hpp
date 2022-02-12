@@ -9,7 +9,7 @@ namespace Framework {
 		FadeTransition(Colour colour, float fade_time, uint8_t max_alpha = 0xFF, uint8_t min_alpha = 0x00);
 
 		void update(float dt);
-		void render(GraphicsObjects* graphics_objects);
+		void render(Graphics* graphics);
 
 		// Only meaningful when OPENING/CLOSING
 		float percent();

@@ -41,6 +41,10 @@ void Game::load_data() {
 
 	// Create font from font spritesheet
 	graphics_objects.font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT] = new Framework::Font(graphics_objects.graphics_ptr, graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::FONT_SPRITESHEET], FONTS::SPACING::MAIN_FONT);
+
+	// Create transitions
+	graphics_objects.transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION] = new Framework::FadeTransition(COLOURS::BLACK, TRANSITIONS::FADE_TIME);
+	graphics_objects.transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::PAUSE_TRANSITION] = new Framework::FadeTransition(COLOURS::BLACK, TRANSITIONS::PAUSE_FADE_TIME, TRANSITIONS::PAUSE_ALPHA);
 }
 
 void Game::clear_data() {
@@ -62,4 +66,10 @@ void Game::clear_data() {
 		delete font_ptr;
 	}
 	graphics_objects.font_ptrs.clear();
+
+	// Clear transitions
+	for (Framework::BaseTransition* transition_ptr : graphics_objects.transition_ptrs) {
+		delete transition_ptr;
+	}
+	graphics_objects.transition_ptrs.clear();
 }

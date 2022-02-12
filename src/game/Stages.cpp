@@ -49,14 +49,11 @@ void IntroStage::render() {
 // TitleStage
 
 void TitleStage::start() {
-	set_transition(new Framework::FadeTransition(COLOURS::BLACK, TRANSITIONS::FADE_TIME));
-	transition->open();
-
 	buttons = setup_menu_buttons(graphics_objects, STRINGS::TITLE::BUTTONS);
-}
 
-void TitleStage::end() {
-	delete transition;
+	// Start transition
+	set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
+	transition->open();
 }
 
 bool TitleStage::update(float dt) {
@@ -66,7 +63,7 @@ bool TitleStage::update(float dt) {
 	for (Framework::Button& button : buttons) {
 		button.update(input);
 
-		if (button.pressed() && _button_selected == BUTTONS::NONE && transition->is_open()) {
+		if (button.pressed() && transition->is_open()) {
 			_button_selected = button.get_id();
 			transition->close();
 		}
@@ -99,7 +96,7 @@ bool TitleStage::update(float dt) {
 void TitleStage::render() {
 	render_menu(graphics_objects, transition->percent(), buttons, _button_selected);
 
-	transition->render(graphics_objects);
+	transition->render(graphics_objects->graphics_ptr);
 } 
 
 // SettingsStage
@@ -107,56 +104,58 @@ void TitleStage::render() {
 void SettingsStage::start() {
 	buttons = setup_menu_buttons(graphics_objects, STRINGS::SETTINGS::BUTTONS);
 
-	// Start timer
-	_transition_timer.start();
+	// Start transition
+	set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
+	transition->open();
 }
 
 bool SettingsStage::update(float dt) {
-	_transition_timer.update(dt);
+	transition->update(dt);
 
 	// Update buttons
 	for (Framework::Button& button : buttons) {
 		button.update(input);
 
-		if (button.pressed() && _button_selected == BUTTONS::NONE && _transition_timer.time() > TRANSITIONS::FADE_TIME) {
+		if (button.pressed() && transition->is_open()) {
 			_button_selected = button.get_id();
 
 			if (_button_selected == BUTTONS::SETTINGS::BACK) {
-				_transition_timer.reset();
-				_transition_timer.start();
+				transition->close();
 			}
 		}
 	}
 
-	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TRANSITIONS::FADE_TIME) {
-		// Next stage!
-		switch (_button_selected) {
-		case BUTTONS::SETTINGS::SOUND:
-			// todo
-			// Un-select button
-			_button_selected = BUTTONS::NONE;
-			break;
+	switch (_button_selected) {
+	case BUTTONS::SETTINGS::SOUND:
+		// todo
+		// Un-select button
+		_button_selected = BUTTONS::NONE;
+		break;
 
-		case BUTTONS::SETTINGS::MUSIC:
-			// todo
-			// Un-select button
-			_button_selected = BUTTONS::NONE;
-			break;
+	case BUTTONS::SETTINGS::MUSIC:
+		// todo
+		// Un-select button
+		_button_selected = BUTTONS::NONE;
+		break;
 
-		case BUTTONS::SETTINGS::BACK:
+	case BUTTONS::SETTINGS::BACK:
+		if (transition->is_closed()) {
+			// Go back!
 			finish(new TitleStage());
-			break;
-
-		default:
-			break;
 		}
+		break;
+
+	default:
+		break;
 	}
 
 	return true;
 }
 
 void SettingsStage::render() {
-	render_menu_with_fade(graphics_objects, _transition_timer, buttons, _button_selected);
+	render_menu(graphics_objects, transition->percent(), buttons, _button_selected);
+
+	transition->render(graphics_objects->graphics_ptr);
 }
 
 // GameStage
@@ -168,6 +167,11 @@ GameStage::GameStage() {
 	cracked_pipe_gen_timer.start();
 
 	create_cracked_pipe(cracked_pipes, cracked_pipe_gen_timer, cracked_pipe_gen_time, cracked_pipe_drop_count);
+
+	// Setup
+	water_level = 0;
+	score = 0;
+	paused = false;
 }
 
 void GameStage::start() {
@@ -179,8 +183,11 @@ void GameStage::start() {
 
 	//buttons = setup_menu_buttons(graphics_objects, STRINGS::SETTINGS::BUTTONS);
 
-	// Start timer
-	_transition_timer.start();
+	// Start transition (keep transition as pause_transition if level was paused)
+	if (!paused) {
+		set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
+	}
+	transition->open();
 }
 
 void GameStage::end() {
@@ -189,7 +196,7 @@ void GameStage::end() {
 }
 
 bool GameStage::update(float dt) {
-	_transition_timer.update(dt);
+	transition->update(dt);
 
 	cracked_pipe_gen_timer.update(dt);
 
@@ -212,7 +219,7 @@ bool GameStage::update(float dt) {
 		drop_pos.y += GAME::DROP_FALL_RATE * dt;
 
 		if (drop_pos.y >= WINDOW::HEIGHT / 2) {
-			printf("OUCH\n");
+			water_level += 1;
 		}
 	}
 
@@ -221,7 +228,23 @@ bool GameStage::update(float dt) {
 	if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
 		// User has paused
 		// Pass this stage to PausedStage so that it still renders in the background
-		finish(new PausedStage(this), false); // NOTE: WE NEED TRANSITIONS!
+		paused = true;
+
+		// We need to change transition so it only fades to semi-transparent
+		set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::PAUSE_TRANSITION]);
+
+		transition->close();
+	}
+
+	if (transition->is_closed()) {
+		if (paused) {
+			// Paused game
+			finish(new PausedStage(this), false);
+		}
+		else {
+			// Must be end of game
+			// TODO
+		}
 	}
 
 	return true;
@@ -242,13 +265,10 @@ void GameStage::render() {
 	}
 
 	// Render bucket
+	// TODO - save bucket pos, get in update() and use that for rendering and collision checks
 	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BUCKET_RECT, input->get_mouse()->position() / SPRITE::BUCKET_SCALE - SPRITE::RECT::BUCKET_RECT.size / 2, SPRITE::BUCKET_SCALE);
 
-
-	handle_fade(graphics_objects, _transition_timer.time() / TRANSITIONS::FADE_TIME, FadeState::IN); // todo : get correct fade state
-
-	// when fading to paused menu:
-	// handle_fade(graphics_objects, _transition_timer, FadeState::OUT, 0x00, 0x7F); // todo: get FadeState
+	transition->render(graphics_objects->graphics_ptr);
 }
 
 // PausedStage
@@ -259,20 +279,28 @@ PausedStage::PausedStage(BaseStage* background_stage) : BaseStage() {
 }
 
 void PausedStage::start() {
-	//buttons = setup_menu_buttons(graphics_objects, STRINGS::SETTINGS::BUTTONS);
+	//buttons = setup_menu_buttons(graphics_objects, STRINGS::PAUSED::BUTTONS);
 
-	// Start timer
-	_transition_timer.start();
+	// Start transition (but we don't actually render the fade-in)
+	set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
+	transition->open();
 }
 
 bool PausedStage::update(float dt) {
-	_transition_timer.update(dt);
+	transition->update(dt);
 
 	if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
-		// Exit pause
-		finish(_background_stage);
-		// TODO: animation
-		// TODO: button to return
+		transition->close();
+	}
+
+	if (transition->is_closed()) {
+		if (_button_selected == BUTTONS::PAUSED::EXIT) {
+			// todo
+		}
+		else {
+			// Return to game (exit pause)
+			finish(_background_stage);
+		}
 	}
 
 	return true;
@@ -282,8 +310,8 @@ void PausedStage::render() {
 	// Render background stage
 	_background_stage->render();
 
-	// Fade out background graphics slightly
-	handle_fade(graphics_objects, _transition_timer.time() / TRANSITIONS::FADE_TIME, FadeState::IN, 0x00, 0x7F); // todo: get FadeState
+	render_popup_and_buttons(graphics_objects, transition->percent(), buttons, transition->state() == Framework::BaseTransition::TransitionState::CLOSING || transition->is_closed() ? FadeState::OUT : FadeState::IN);
 
-	render_popup_and_buttons(graphics_objects, _transition_timer.time() / TRANSITIONS::FADE_TIME, buttons, FadeState::IN); // todo: work out fade state
+	// Only show transition if exiting
+	if (transition->state() == Framework::BaseTransition::TransitionState::CLOSING && _button_selected == BUTTONS::PAUSED::EXIT) transition->render(graphics_objects->graphics_ptr);
 }

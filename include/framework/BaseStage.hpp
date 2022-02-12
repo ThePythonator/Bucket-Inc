@@ -24,6 +24,7 @@ namespace Framework {
 		void init(GraphicsObjects* _graphics_objects, InputHandler* _input);
 
 		void set_transition(BaseTransition* _transition);
+		void clear_transition();
 
 	protected:
 		void finish(BaseStage* next, bool can_delete_me = true);

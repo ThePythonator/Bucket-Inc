@@ -20,22 +20,22 @@ namespace Framework {
 		}
 	}
 
-	void FadeTransition::render(GraphicsObjects* graphics_objects) {
+	void FadeTransition::render(Graphics* graphics) {
 		// Handle fading
 		switch (_state) {
 		case TransitionState::CLOSED:
 			// Fill with solid colour
-			graphics_objects->graphics_ptr->fill(_colour);
+			graphics->fill(_colour, _max);
 			break;
 
 		case TransitionState::CLOSING:
 			// Fade out
-			graphics_objects->graphics_ptr->fill(_colour, Framework::Curves::linear(_min, _max, _timer.time() / TRANSITIONS::FADE_TIME));
+			graphics->fill(_colour, Framework::Curves::linear(_min, _max, percent()));
 			break;
 
 		case TransitionState::OPENING:
 			// Fade in
-			graphics_objects->graphics_ptr->fill(_colour, Framework::Curves::linear(_max, _min, _timer.time() / TRANSITIONS::FADE_TIME));
+			graphics->fill(_colour, Framework::Curves::linear(_max, _min, percent()));
 			break;
 
 		default:

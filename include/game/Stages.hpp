@@ -13,6 +13,8 @@
 
 class IntroStage : public Framework::BaseStage {
 public:
+	//void start();
+
 	bool update(float dt);
 	void render();
 
@@ -23,7 +25,6 @@ private:
 class TitleStage : public Framework::BaseStage {
 public:
 	void start();
-	void end();
 
 	bool update(float dt);
 	void render();
@@ -40,8 +41,6 @@ public:
 	void render();
 
 private:
-	Framework::Timer _transition_timer;
-
 	uint8_t _button_selected = BUTTONS::NONE;
 };
 
@@ -56,10 +55,14 @@ public:
 	void render();
 
 private:
-	Framework::Timer _transition_timer;
 	Framework::Timer cracked_pipe_gen_timer;
 	float cracked_pipe_gen_time;
 	float cracked_pipe_drop_count;
+
+	bool paused;
+
+	uint8_t water_level;
+	uint16_t score;
 
 	std::vector<CrackedPipe> cracked_pipes;
 	std::vector<Framework::vec2> drops;
@@ -75,7 +78,7 @@ public:
 	void render();
 
 private:
-	Framework::Timer _transition_timer;
+	uint8_t _button_selected = BUTTONS::NONE;
 
 	BaseStage* _background_stage;
 };

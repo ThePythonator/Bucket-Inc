@@ -133,7 +133,8 @@ namespace TIMINGS {
 
 namespace TRANSITIONS {
 	extern const float FADE_TIME;
-	extern uint8_t PAUSE_TRANSITIONS_MAX;
+	extern const float PAUSE_FADE_TIME;
+	extern uint8_t PAUSE_ALPHA;
 }
 
 namespace SPRITE {
@@ -193,6 +194,15 @@ namespace BUTTONS {
 			SOUND,
 			MUSIC,
 			BACK,
+
+			TOTAL
+		};
+	}
+
+	namespace PAUSED {
+		enum PAUSED {
+			RESUME,
+			EXIT,
 
 			TOTAL
 		};

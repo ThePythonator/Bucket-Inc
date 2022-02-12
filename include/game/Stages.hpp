@@ -7,6 +7,8 @@
 #include "Timer.hpp"
 #include "Curves.hpp"
 
+#include "FadeTransition.hpp"
+
 #include "GameUtilities.hpp"
 
 class IntroStage : public Framework::BaseStage {
@@ -21,13 +23,12 @@ private:
 class TitleStage : public Framework::BaseStage {
 public:
 	void start();
+	void end();
 
 	bool update(float dt);
 	void render();
 
 private:
-	Framework::Timer _transition_timer;
-
 	uint8_t _button_selected = BUTTONS::NONE;
 };
 
@@ -46,6 +47,8 @@ private:
 
 class GameStage : public Framework::BaseStage {
 public:
+	GameStage();
+
 	void start();
 	void end();
 
@@ -54,6 +57,12 @@ public:
 
 private:
 	Framework::Timer _transition_timer;
+	Framework::Timer cracked_pipe_gen_timer;
+	float cracked_pipe_gen_time;
+	float cracked_pipe_drop_count;
+
+	std::vector<CrackedPipe> cracked_pipes;
+	std::vector<Framework::vec2> drops;
 };
 
 class PausedStage : public Framework::BaseStage {

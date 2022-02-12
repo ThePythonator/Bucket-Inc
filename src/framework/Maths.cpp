@@ -37,6 +37,14 @@ namespace Framework {
 			   b.position.y + b.size.y >= a.position.y && b.position.y <= a.position.y + a.size.y;
 	}
 
+	vec2 Vec(float x, float y) {
+		return vec2{ x, y };
+	}
+
+	vec2 Vec(int x, int y) {
+		return vec2{ static_cast<float>(x), static_cast<float>(y) };
+	}
+
 	// Maths utilities
 
 	float length_squared(vec2 v) {
@@ -71,5 +79,9 @@ namespace Framework {
 
 	float clamp(float x, float _min, float _max) {
 		return std::min(_max, std::max(_min, x));
+	}
+
+	float randf() {
+		return (rand() % 1001) / 1000.0f;
 	}
 }

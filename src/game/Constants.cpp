@@ -90,7 +90,7 @@ namespace TIMINGS {
 		namespace DURATION {
 			const float INITIAL_DELAY = 1.0f;
 			const float FADE_IN = 2.0f;
-			const float INTRO_DELAY = 3.0f;
+			const float INTRO_DELAY = 2.5f;
 			const float FADE_OUT = 2.0f;
 		}
 
@@ -101,12 +101,11 @@ namespace TIMINGS {
 			const float FADE_OUT = DURATION::FADE_OUT + INTRO_DELAY;
 		}
 	}
+}
 
-	namespace MENU {
-		namespace DURATION {
-			const float FADE = 1.2f;
-		}
-	}
+namespace TRANSITIONS {
+	const float FADE_TIME = 1.2f;
+	uint8_t PAUSE_TRANSITIONS_MAX = 0x7F;
 }
 
 namespace SPRITE {
@@ -129,6 +128,7 @@ namespace SPRITE {
 
 	namespace RECT {
 		const Framework::Rect BUCKET_RECT = Framework::Rect(0, 0, SIZE * 2, SIZE * 3);
+		const Framework::Rect BOX_RECT = Framework::Rect(SIZE * 4, SIZE * 2, SIZE * 4, SIZE * 3);
 	}
 
 	const uint8_t PIPES_ARRAY_WIDTH = 16;
@@ -144,6 +144,10 @@ namespace SPRITE {
 		0,0,0,0,0,0,13,19,11,16,19,14,0,0,28,0,
 		0,0,0,0,0,0,0,0,0,0,0,0,0,0,13,19
 	};
+
+	const Framework::vec2 BOX_POSITION = Framework::Vec(SIZE * 1, SIZE * 4);
+
+	const uint8_t BUCKET_SCALE = SCALE / 2;
 }
 
 namespace CURVES {
@@ -161,4 +165,19 @@ namespace CURVES {
 
 namespace BUTTONS {
 	const uint8_t NONE = 255;
+}
+
+namespace GAME {
+	const float INITIAL_CRACKED_PIPE_DELAY = 6.0f;
+	const float INITIAL_CRACKED_PIPE_DROP_COUNT = 1.5f;
+
+	const float CRACKED_PIPE_DELAY_DECREASE_FACTOR = 0.95f;
+	const float CRACKED_PIPE_DROP_INCREASE_FACTOR = 1.05f;
+
+	const float CRACKED_PIPE_DROP_DELAY_MIN = 1.0f;
+	const float CRACKED_PIPE_DROP_DELAY_MAX = 2.0f;
+
+	const uint8_t MAX_CRACKED_PIPES = 8;
+
+	const float DROP_FALL_RATE = 100.0f;
 }

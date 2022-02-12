@@ -44,4 +44,8 @@ namespace Framework {
 		// Let user do any setup they need, possibly with graphics_objects or input
 		start();
 	}
+
+	void BaseStage::set_transition(BaseTransition* _transition) {
+		transition = _transition;
+	}
 }

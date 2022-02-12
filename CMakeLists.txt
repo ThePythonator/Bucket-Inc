@@ -37,6 +37,8 @@ set(FRAMEWORK_SOURCES
 	"BaseGame.cpp"
 	
 	"BaseStage.cpp"
+	"BaseTransition.cpp"
+	"FadeTransition.cpp"
 	
 	"Input.cpp"
 	"Keys.cpp"

@@ -42,12 +42,12 @@ void render_background_scene(Framework::GraphicsObjects* graphics_objects, std::
 	}
 
 	// Render box thing with wires
-	// TODO
+	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BOX_RECT, SPRITE::BOX_POSITION);
 }
 
-void render_popup_and_buttons(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, std::vector<Framework::Button> buttons, FadeState state) {
+void render_popup_and_buttons(Framework::GraphicsObjects* graphics_objects, float transition_percent, std::vector<Framework::Button>& buttons, FadeState state) {
 	// Calculate offset used for animating menu options
-	float t = Framework::clamp(transition_timer.time() / TIMINGS::MENU::DURATION::FADE, 0.0f, 1.0f);
+	float t = Framework::clamp(transition_percent, 0.0f, 1.0f);
 	if (state == FadeState::OUT) {
 		// Reverse animation
 		t = 1.0f - t;
@@ -66,29 +66,33 @@ void render_popup_and_buttons(Framework::GraphicsObjects* graphics_objects, Fram
 	}
 }
 
-void render_menu(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, std::vector<Framework::Button> buttons, uint8_t button_selected) {
+void render_menu(Framework::GraphicsObjects* graphics_objects, float transition_percent, std::vector<Framework::Button>& buttons, uint8_t button_selected) {
 	render_background_scene(graphics_objects);
 
 	// Fade out background graphics slightly
 	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
 
-	render_popup_and_buttons(graphics_objects, transition_timer, buttons, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
-
-	handle_fade(graphics_objects, transition_timer, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
+	render_popup_and_buttons(graphics_objects, transition_percent, buttons, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
 }
 
-void handle_fade(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, FadeState state, uint8_t low, uint8_t high) {
+void render_menu_with_fade(Framework::GraphicsObjects* graphics_objects, Framework::Timer& transition_timer, std::vector<Framework::Button>& buttons, uint8_t button_selected) {
+	render_menu(graphics_objects, transition_timer.time() / TRANSITIONS::FADE_TIME, buttons, button_selected);
+
+	handle_fade(graphics_objects, transition_timer.time() / TRANSITIONS::FADE_TIME, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
+}
+
+void handle_fade(Framework::GraphicsObjects* graphics_objects, float transition_percent, FadeState state, uint8_t low, uint8_t high) {
 	// Handle fading
 	if (state == FadeState::IN) {
-		if (transition_timer.time() < TIMINGS::MENU::DURATION::FADE) {
+		if (transition_percent < 1.0f) {
 			// Fade in
-			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, transition_timer.time() / TIMINGS::MENU::DURATION::FADE));
+			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0xFF, 0x00, transition_percent));
 		}
 	}
 	else if (state == FadeState::OUT) {
-		if (transition_timer.time() < TIMINGS::MENU::DURATION::FADE) {
+		if (transition_percent < 1.0f) {
 			// Fade out
-			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0x00, 0xFF, transition_timer.time() / TIMINGS::MENU::DURATION::FADE));
+			graphics_objects->graphics_ptr->fill(COLOURS::BLACK, Framework::Curves::linear(0x00, 0xFF, transition_percent));
 		}
 		else {
 			graphics_objects->graphics_ptr->fill(COLOURS::BLACK);
@@ -96,7 +100,7 @@ void handle_fade(Framework::GraphicsObjects* graphics_objects, Framework::Timer&
 	}
 }
 
-std::vector<Framework::Button> setup_menu_buttons(Framework::GraphicsObjects* graphics_objects, std::vector<std::string> names) {
+std::vector<Framework::Button> setup_menu_buttons(Framework::GraphicsObjects* graphics_objects, const std::vector<std::string>& names) {
 	std::vector<Framework::Button> buttons;
 
 	// Create menu buttons
@@ -123,4 +127,51 @@ std::vector<Framework::Button> setup_menu_buttons(Framework::GraphicsObjects* gr
 	}
 
 	return buttons;
+}
+
+void create_cracked_pipe(std::vector<CrackedPipe>& cracked_pipes, Framework::Timer& cracked_pipe_gen_timer, float& cracked_pipe_gen_time, float& cracked_pipe_drop_count) {
+	if (cracked_pipe_gen_timer.time() < cracked_pipe_gen_time) {
+		// Not time to create pipe yet
+		return;
+	}
+
+	if (cracked_pipes.size() >= GAME::MAX_CRACKED_PIPES) {
+		// Don't allow too many
+		return;
+	}
+
+	uint8_t index = 0;
+	uint8_t id = 0;
+	bool found = false;
+
+	while (!found) {
+		found = false;
+
+		id = rand() % SPRITE::PIPES_ARRAY_SIZE;
+		index = SPRITE::PIPES[id] - 1;
+
+		if (SPRITE::PIPES[id] != 0) {
+
+			if (std::count(SPRITE::INDEX::CRACKED_PIPES_HORIZONTAL.begin(), SPRITE::INDEX::CRACKED_PIPES_HORIZONTAL.end(), index) > 0 ||
+				std::count(SPRITE::INDEX::CRACKED_PIPES_VERTICAL.begin(), SPRITE::INDEX::CRACKED_PIPES_VERTICAL.end(), index) > 0) {
+				found = true;
+
+				// sprite_index is a cracked pipe
+				for (CrackedPipe& pipe : cracked_pipes) {
+					if (pipe.get_id() == id) {
+						found = false;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	cracked_pipes.push_back(CrackedPipe(index, id, static_cast<uint8_t>(cracked_pipe_drop_count)));
+
+	cracked_pipe_gen_timer.reset();
+	cracked_pipe_gen_timer.start();
+
+	cracked_pipe_gen_time *= GAME::CRACKED_PIPE_DELAY_DECREASE_FACTOR;
+	cracked_pipe_drop_count *= GAME::CRACKED_PIPE_DROP_INCREASE_FACTOR;
 }

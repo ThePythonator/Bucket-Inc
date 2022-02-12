@@ -56,4 +56,10 @@ void Game::clear_data() {
 		delete image_ptr;
 	}
 	graphics_objects.image_ptrs.clear();
+
+	// Clear fonts
+	for (Framework::Font* font_ptr : graphics_objects.font_ptrs) {
+		delete font_ptr;
+	}
+	graphics_objects.font_ptrs.clear();
 }

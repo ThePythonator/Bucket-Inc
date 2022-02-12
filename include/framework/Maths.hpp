@@ -39,6 +39,9 @@ namespace Framework {
 	bool colliding(Rect a, vec2 b);
 	bool colliding(Rect a, Rect b);
 
+	vec2 Vec(float x, float y);
+	vec2 Vec(int x, int y);
+
 	float length_squared(vec2 v);
 	vec2 normalise(vec2 v);
 
@@ -54,4 +57,10 @@ namespace Framework {
 	vec2 perpendicular_cw(vec2 vector);
 
 	float clamp(float x, float _min, float _max);
+
+	/*
+	* Generates a random float between 0 and 1 inclusive.
+	* Resolution is 0.001f.
+	*/
+	float randf();
 }

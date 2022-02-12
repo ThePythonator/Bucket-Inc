@@ -49,27 +49,30 @@ void IntroStage::render() {
 // TitleStage
 
 void TitleStage::start() {
-	buttons = setup_menu_buttons(graphics_objects, STRINGS::TITLE::BUTTONS);
+	set_transition(new Framework::FadeTransition(COLOURS::BLACK, TRANSITIONS::FADE_TIME));
+	transition->open();
 
-	// Start timer
-	_transition_timer.start();
+	buttons = setup_menu_buttons(graphics_objects, STRINGS::TITLE::BUTTONS);
+}
+
+void TitleStage::end() {
+	delete transition;
 }
 
 bool TitleStage::update(float dt) {
-	_transition_timer.update(dt);
+	transition->update(dt);
 
 	// Update buttons
 	for (Framework::Button& button : buttons) {
 		button.update(input);
 
-		if (button.pressed() && _button_selected == BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
+		if (button.pressed() && _button_selected == BUTTONS::NONE && transition->is_open()) {
 			_button_selected = button.get_id();
-			_transition_timer.reset();
-			_transition_timer.start();
+			transition->close();
 		}
 	}
 
-	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
+	if (transition->is_closed()) {
 		// Next stage!
 		switch (_button_selected) {
 		case BUTTONS::TITLE::PLAY:
@@ -94,7 +97,9 @@ bool TitleStage::update(float dt) {
 }
 
 void TitleStage::render() {
-	render_menu(graphics_objects, _transition_timer, buttons, _button_selected);
+	render_menu(graphics_objects, transition->percent(), buttons, _button_selected);
+
+	transition->render(graphics_objects);
 } 
 
 // SettingsStage
@@ -113,7 +118,7 @@ bool SettingsStage::update(float dt) {
 	for (Framework::Button& button : buttons) {
 		button.update(input);
 
-		if (button.pressed() && _button_selected == BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
+		if (button.pressed() && _button_selected == BUTTONS::NONE && _transition_timer.time() > TRANSITIONS::FADE_TIME) {
 			_button_selected = button.get_id();
 
 			if (_button_selected == BUTTONS::SETTINGS::BACK) {
@@ -123,7 +128,7 @@ bool SettingsStage::update(float dt) {
 		}
 	}
 
-	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TIMINGS::MENU::DURATION::FADE) {
+	if (_button_selected != BUTTONS::NONE && _transition_timer.time() > TRANSITIONS::FADE_TIME) {
 		// Next stage!
 		switch (_button_selected) {
 		case BUTTONS::SETTINGS::SOUND:
@@ -151,14 +156,23 @@ bool SettingsStage::update(float dt) {
 }
 
 void SettingsStage::render() {
-	render_menu(graphics_objects, _transition_timer, buttons, _button_selected);
+	render_menu_with_fade(graphics_objects, _transition_timer, buttons, _button_selected);
 }
 
 // GameStage
 
+GameStage::GameStage() {
+	cracked_pipe_gen_time = GAME::INITIAL_CRACKED_PIPE_DELAY;
+	cracked_pipe_drop_count = GAME::INITIAL_CRACKED_PIPE_DROP_COUNT;
+
+	cracked_pipe_gen_timer.start();
+
+	create_cracked_pipe(cracked_pipes, cracked_pipe_gen_timer, cracked_pipe_gen_time, cracked_pipe_drop_count);
+}
+
 void GameStage::start() {
 	// Hide cursor
-	//input->get_mouse()->set_cursor(false);
+	input->get_mouse()->set_cursor(false);
 	//SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND));
 	//SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_NO));
 	//SDL_SetCursor(SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAIT));
@@ -177,6 +191,33 @@ void GameStage::end() {
 bool GameStage::update(float dt) {
 	_transition_timer.update(dt);
 
+	cracked_pipe_gen_timer.update(dt);
+
+
+	create_cracked_pipe(cracked_pipes, cracked_pipe_gen_timer, cracked_pipe_gen_time, cracked_pipe_drop_count);
+
+	for (CrackedPipe& pipe : cracked_pipes) {
+		pipe.update(dt);
+
+		if (pipe.can_create_drop()) {
+			drops.push_back(pipe.create_drop());
+		}
+	}
+
+	cracked_pipes.erase(std::remove_if(cracked_pipes.begin(), cracked_pipes.end(), [](CrackedPipe& pipe) { return pipe.finished(); }), cracked_pipes.end());
+
+
+	// All a mess!
+	for (Framework::vec2& drop_pos : drops) {
+		drop_pos.y += GAME::DROP_FALL_RATE * dt;
+
+		if (drop_pos.y >= WINDOW::HEIGHT / 2) {
+			printf("OUCH\n");
+		}
+	}
+
+	drops.erase(std::remove_if(drops.begin(), drops.end(), [](Framework::vec2& pos) { return pos.y >= WINDOW::HEIGHT / 2; }), drops.end());
+
 	if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
 		// User has paused
 		// Pass this stage to PausedStage so that it still renders in the background
@@ -187,12 +228,24 @@ bool GameStage::update(float dt) {
 }
 
 void GameStage::render() {
-	render_background_scene(graphics_objects); //, cracked_pipes
+	render_background_scene(graphics_objects, cracked_pipes);
+
+	// Render drops
+	for (Framework::vec2 drop_pos : drops) {
+		//graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BUCKET_RECT, input->get_mouse()->position() / SPRITE::BUCKET_SCALE - SPRITE::RECT::BUCKET_RECT.size / 2, SPRITE::BUCKET_SCALE);
+
+		// to fix
+		drop_pos *= 2;
+		drop_pos += SPRITE::SIZE_HALF;
+		graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(24, drop_pos, SPRITE::BUCKET_SCALE);
+		graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(32, drop_pos + Framework::Vec(0, SPRITE::SIZE), SPRITE::BUCKET_SCALE);
+	}
 
 	// Render bucket
-	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BUCKET_RECT, input->get_mouse()->position() / SPRITE::SCALE - SPRITE::RECT::BUCKET_RECT.size / 2);
+	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BUCKET_RECT, input->get_mouse()->position() / SPRITE::BUCKET_SCALE - SPRITE::RECT::BUCKET_RECT.size / 2, SPRITE::BUCKET_SCALE);
 
-	handle_fade(graphics_objects, _transition_timer, FadeState::IN); // todo : get correct fade state
+
+	handle_fade(graphics_objects, _transition_timer.time() / TRANSITIONS::FADE_TIME, FadeState::IN); // todo : get correct fade state
 
 	// when fading to paused menu:
 	// handle_fade(graphics_objects, _transition_timer, FadeState::OUT, 0x00, 0x7F); // todo: get FadeState
@@ -230,7 +283,7 @@ void PausedStage::render() {
 	_background_stage->render();
 
 	// Fade out background graphics slightly
-	handle_fade(graphics_objects, _transition_timer, FadeState::IN, 0x00, 0x7F); // todo: get FadeState
+	handle_fade(graphics_objects, _transition_timer.time() / TRANSITIONS::FADE_TIME, FadeState::IN, 0x00, 0x7F); // todo: get FadeState
 
-	render_popup_and_buttons(graphics_objects, _transition_timer, buttons, FadeState::IN); // todo: work out fade state
+	render_popup_and_buttons(graphics_objects, _transition_timer.time() / TRANSITIONS::FADE_TIME, buttons, FadeState::IN); // todo: work out fade state
 }

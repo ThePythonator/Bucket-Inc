@@ -83,6 +83,15 @@ namespace GRAPHICS_OBJECTS {
 			TOTAL_FONTS
 		};
 	}
+
+	namespace TRANSITIONS {
+		enum TRANSITIONS {
+			FADE_TRANSITION,
+			PAUSE_TRANSITION,
+
+			TOTAL_TRANSITIONS
+		};
+	}
 }
 
 namespace FONTS {
@@ -120,12 +129,11 @@ namespace TIMINGS {
 			extern const float FADE_OUT;
 		}
 	}
+}
 
-	namespace MENU {
-		namespace DURATION {
-			extern const float FADE;
-		}
-	}
+namespace TRANSITIONS {
+	extern const float FADE_TIME;
+	extern uint8_t PAUSE_TRANSITIONS_MAX;
 }
 
 namespace SPRITE {
@@ -148,12 +156,17 @@ namespace SPRITE {
 
 	namespace RECT {
 		extern const Framework::Rect BUCKET_RECT;
+		extern const Framework::Rect BOX_RECT;
 	}
 
 	extern const uint8_t PIPES_ARRAY_WIDTH;
 	extern const uint8_t PIPES_ARRAY_HEIGHT;
 	extern const uint8_t PIPES_ARRAY_SIZE;
 	extern const uint8_t PIPES[];
+
+	extern const Framework::vec2 BOX_POSITION;
+
+	extern const uint8_t BUCKET_SCALE;
 }
 
 namespace CURVES {
@@ -184,4 +197,18 @@ namespace BUTTONS {
 			TOTAL
 		};
 	}
+}
+
+namespace GAME {
+	extern const float INITIAL_CRACKED_PIPE_DELAY;
+	extern const float INITIAL_CRACKED_PIPE_DROP_COUNT;
+	extern const float CRACKED_PIPE_DELAY_DECREASE_FACTOR;
+	extern const float CRACKED_PIPE_DROP_INCREASE_FACTOR;
+
+	extern const float CRACKED_PIPE_DROP_DELAY_MIN;
+	extern const float CRACKED_PIPE_DROP_DELAY_MAX;
+
+	extern const uint8_t MAX_CRACKED_PIPES;
+
+	extern const float DROP_FALL_RATE;
 }

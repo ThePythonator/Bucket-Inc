@@ -3,6 +3,7 @@
 #include "Input.hpp"
 #include "GraphicsObjects.hpp"
 #include "Button.hpp"
+#include "BaseTransition.hpp"
 
 namespace Framework {
 	class BaseStage {
@@ -22,6 +23,8 @@ namespace Framework {
 
 		void init(GraphicsObjects* _graphics_objects, InputHandler* _input);
 
+		void set_transition(BaseTransition* _transition);
+
 	protected:
 		void finish(BaseStage* next, bool can_delete_me = true);
 
@@ -29,6 +32,8 @@ namespace Framework {
 
 		GraphicsObjects* graphics_objects = nullptr;
 		InputHandler* input = nullptr;
+
+		BaseTransition* transition = nullptr;
 
 	private:
 		bool _finished = false;

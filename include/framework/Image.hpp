@@ -26,6 +26,8 @@ namespace Framework {
 
 		bool refresh(uint8_t source_flag);
 
+		void render(Rect source_rect, Rect destination_rect, float angle, vec2 centre, ImageFlip flip = ImageFlip::FLIP_NONE);
+		void render(Rect source_rect, Rect destination_rect, float angle, ImageFlip flip = ImageFlip::FLIP_NONE);
 		void render(Rect source_rect, Rect destination_rect);
 		void render(Rect destination_rect);
 

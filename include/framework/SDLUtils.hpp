@@ -30,4 +30,6 @@ namespace Framework::SDLUtils {
 	int SDL_RenderDrawCircle(SDL_Renderer* renderer, int x, int y, int radius);
 
 	SDL_Rect get_sdl_rect(Rect rect);
+	SDL_Point get_sdl_point(vec2 vec);
+	SDL_RendererFlip get_sdl_renderer_flip(ImageFlip flip);
 }

@@ -13,6 +13,8 @@ namespace Framework {
 		void sprite(uint16_t index, float x, float y, SpriteTransform transform = SpriteTransform::NONE);
 		void sprite(uint16_t index, vec2 position, float scale, SpriteTransform transform = SpriteTransform::NONE);
 		void sprite(uint16_t index, float x, float y, float scale, SpriteTransform transform = SpriteTransform::NONE);
+		void sprite(uint16_t index, vec2 position, float scale, float angle, SpriteTransform transform = SpriteTransform::NONE);
+		void sprite(uint16_t index, float x, float y, float scale, float angle, SpriteTransform transform = SpriteTransform::NONE);
 		void sprite(uint16_t index, vec2 position, float scale, float angle, vec2 centre, SpriteTransform transform = SpriteTransform::NONE);
 		void sprite(uint16_t index, float x, float y, float scale, float angle, vec2 centre, SpriteTransform transform = SpriteTransform::NONE);
 

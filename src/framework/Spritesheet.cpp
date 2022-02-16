@@ -43,6 +43,14 @@ namespace Framework {
 		rect(src, x, y, scale, transform);
 	}
 
+	void Spritesheet::sprite(uint16_t index, vec2 position, float scale, float angle, SpriteTransform transform) {
+		sprite(index, position.x, position.y, scale, angle, transform);
+	}
+	void Spritesheet::sprite(uint16_t index, float x, float y, float scale, float angle, SpriteTransform transform) {
+		Rect src = Rect(_sprite_size * (index % _columns), _sprite_size * (index / _columns), _sprite_size, _sprite_size);
+		rect(src, x, y, scale, angle, scale * src.size / 2, transform); // tod fi?
+	}
+
 	void Spritesheet::sprite(uint16_t index, vec2 position, float scale, float angle, vec2 centre, SpriteTransform transform) {
 		sprite(index, position.x, position.y, scale, angle, centre, transform);
 	}
@@ -64,19 +72,16 @@ namespace Framework {
 		rect(src, position.x, position.y, scale, transform);
 	}
 	void Spritesheet::rect(Rect src, float x, float y, float scale, SpriteTransform transform) {
-		// TODO: handle transforms
 		Rect dst = Rect(_scale_positions ? x * scale : x, _scale_positions ? y * scale : y, src.size.x * scale, src.size.y * scale);
-		_spritesheet_image->render(src, dst);
+		_spritesheet_image->render(src, dst, transform_to_angle(transform), dst.size / 2, transform_to_imageflip(transform)); // to fix?
 	}
 
 	void Spritesheet::rect(Rect src, vec2 position, float scale, float angle, vec2 centre, SpriteTransform transform) {
 		rect(src, position.x, position.y, scale, angle, centre, transform);
 	}
 	void Spritesheet::rect(Rect src, float x, float y, float scale, float angle, vec2 centre, SpriteTransform transform) {
-		// TODO: handle transforms
-		// TODO: handle rotations
 		Rect dst = Rect(_scale_positions ? x * scale : x, _scale_positions ? y * scale : y, src.size.x * scale, src.size.y * scale);
-		_spritesheet_image->render(src, dst);
+		_spritesheet_image->render(src, dst, angle + transform_to_angle(transform), centre, transform_to_imageflip(transform));
 	}
 
 	uint8_t Spritesheet::get_sprite_size() {

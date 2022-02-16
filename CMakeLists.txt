@@ -57,6 +57,7 @@ set(FRAMEWORK_SOURCES
 	"Colour.cpp"
 
 	"Maths.cpp"
+	"Transform.cpp"
 
 	"Timer.cpp"
 	"Curves.cpp"

@@ -45,6 +45,14 @@ namespace Framework {
 	float length_squared(vec2 v);
 	vec2 normalise(vec2 v);
 
+	enum ImageFlip {
+		FLIP_NONE		= 0b00,
+		FLIP_HORIZONTAL = 0b01,
+		FLIP_VERTICAL	= 0b10,
+
+		FLIP_BOTH		= FLIP_HORIZONTAL | FLIP_VERTICAL
+	};
+
 	// Convert to/from radians and degrees
 	float deg_to_rad(float degrees);
 	float rad_to_deg(float radians);

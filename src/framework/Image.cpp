@@ -111,13 +111,26 @@ namespace Framework {
 		}*/
 	}
 
+	void Image::render(Rect source_rect, Rect destination_rect, float angle, vec2 centre, ImageFlip flip) {
+		// If size is unset, default to Image's size
+		if (source_rect.size == vec2{ 0.0f, 0.0f })			source_rect.size = get_size();
+		if (destination_rect.size == vec2{ 0.0f, 0.0f })	destination_rect.size = get_size();
+
+		SDL_RenderCopyEx(graphics_ptr->get_renderer(), texture, &SDLUtils::get_sdl_rect(source_rect), &SDLUtils::get_sdl_rect(destination_rect), angle, &SDLUtils::get_sdl_point(centre), SDLUtils::get_sdl_renderer_flip(flip));
+	}
+
+	void Image::render(Rect source_rect, Rect destination_rect, float angle, ImageFlip flip) {
+		// If size is unset, default to Image's size
+		if (source_rect.size == vec2{ 0.0f, 0.0f })			source_rect.size = get_size();
+		if (destination_rect.size == vec2{ 0.0f, 0.0f })	destination_rect.size = get_size();
+
+		render(source_rect, destination_rect, angle, destination_rect.size / 2, flip); // todo?
+	}
+
 	void Image::render(Rect source_rect, Rect destination_rect) {
-		if (source_rect.size == vec2{ 0.0f, 0.0f }) {
-			source_rect.size = get_size();
-		}
-		if (destination_rect.size == vec2{ 0.0f, 0.0f }) {
-			destination_rect.size = get_size();
-		}
+		// If size is unset, default to Image's size
+		if (source_rect.size == vec2{ 0.0f, 0.0f })			source_rect.size = get_size();
+		if (destination_rect.size == vec2{ 0.0f, 0.0f })	destination_rect.size = get_size();
 
 		// Render from texture to screen
 		SDL_RenderCopy(graphics_ptr->get_renderer(), texture, &SDLUtils::get_sdl_rect(source_rect), &SDLUtils::get_sdl_rect(destination_rect));

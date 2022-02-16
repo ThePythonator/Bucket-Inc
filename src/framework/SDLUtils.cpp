@@ -153,4 +153,18 @@ namespace Framework::SDLUtils {
 		SDL_Rect sdl_rect{ static_cast<int>(rect.position.x), static_cast<int>(rect.position.y), static_cast<int>(rect.size.x), static_cast<int>(rect.size.y) };
 		return sdl_rect;
 	}
+
+	SDL_Point get_sdl_point(vec2 vec) {
+		SDL_Point sdl_point{ static_cast<int>(vec.x), static_cast<int>(vec.y) };
+		return sdl_point;
+	}
+
+	SDL_RendererFlip get_sdl_renderer_flip(ImageFlip flip) {
+		uint8_t sdl_flip = SDL_FLIP_NONE;
+
+		if (flip & ImageFlip::FLIP_HORIZONTAL) sdl_flip |= SDL_FLIP_HORIZONTAL;
+		if (flip & ImageFlip::FLIP_VERTICAL) sdl_flip |= SDL_FLIP_HORIZONTAL;
+
+		return static_cast<SDL_RendererFlip>(sdl_flip);
+	}
 }

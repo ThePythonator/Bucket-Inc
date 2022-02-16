@@ -4,3 +4,6 @@ out/
 
 # CMake Settings: don't want my settings copied to the repo
 CMakeSettings.json
+
+# Highscore file
+assets/highscore.json

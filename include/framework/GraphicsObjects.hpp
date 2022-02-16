@@ -17,5 +17,7 @@ namespace Framework {
 		std::vector<Spritesheet*> spritesheet_ptrs;
 		std::vector<Font*> font_ptrs;
 		std::vector<BaseTransition*> transition_ptrs;
+
+		std::string asset_path;
 	};
 }

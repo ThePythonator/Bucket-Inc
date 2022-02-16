@@ -24,6 +24,8 @@ namespace Framework {
 		bool load(std::string path, uint8_t flags = Flags::ALL);
 		void free();
 
+		bool refresh(uint8_t source_flag);
+
 		void render(Rect source_rect, Rect destination_rect);
 		void render(Rect destination_rect);
 

@@ -61,7 +61,7 @@ set(FRAMEWORK_SOURCES
 	"Timer.cpp"
 	"Curves.cpp"
 
-#	"File.cpp"
+	"File.cpp"
 
 	"SDLUtils.cpp"
 )

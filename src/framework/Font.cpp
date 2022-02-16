@@ -105,10 +105,20 @@ namespace Framework {
 				}
 			}
 		}
+
+		// Update the image, so it transfers the changes we made from the surface over to the texture
+		// Refresh takes a flag which determines which attribute to copy the changes from
+		font_spritesheet_ptr->get_image()->refresh(Image::Flags::SDL_SURFACE);
 	}
 
 	void Font::render_text(std::string text, vec2 position, Colour colour, AnchorPosition anchor_position) {
-		vec2 current_position = position / font_spritesheet_ptr->get_scale();
+		render_text(text, position, colour, font_spritesheet_ptr->get_scale(), anchor_position);
+	}
+
+	void Font::render_text(std::string text, vec2 position, Colour colour, float scale, AnchorPosition anchor_position) {
+		set_colour(colour);
+
+		vec2 current_position = position / scale;
 		vec2 size;
 
 		size.y = font_spritesheet_ptr->get_sprite_size();
@@ -139,7 +149,7 @@ namespace Framework {
 
 		for (uint8_t c : text) {
 			// Render character
-			render_char(c, current_position);
+			render_char(c, current_position, scale);
 
 			// Update current_position.x by getting character width
 			current_position.x += character_rect(c).size.x + _spacing;
@@ -147,18 +157,22 @@ namespace Framework {
 	}
 
 	Rect Font::character_rect(uint8_t c) {
-		return valid_character(c) ? character_rects[c - ALPHABET_INDEX_START] : Rect();
+		return (valid_character(c) || c == CHAR_SPACE) ? character_rects[c - ALPHABET_INDEX_START] : Rect();
 	}
 
 	bool Font::valid_character(uint8_t c) {
 		return c >= ALPHABET_INDEX_START && c < ALPHABET_INDEX_START + ALPHABET_LENGTH && c != CHAR_SPACE && c != CHAR_DELETE;
 	}
 
-	void Font::render_char(uint8_t c, vec2 position) {
+	Spritesheet* Font::get_spritesheet_ptr() {
+		return font_spritesheet_ptr;
+	}
+
+	void Font::render_char(uint8_t c, vec2 position, float scale) {
 		// Check character is one we have an image/rect for (don't include spaces or delete key)
 		if (valid_character(c)) {
 			// Render character
-			font_spritesheet_ptr->rect(character_rects[c - ALPHABET_INDEX_START], position);
+			font_spritesheet_ptr->rect(character_rects[c - ALPHABET_INDEX_START], position, scale);
 		}
 	}
 
@@ -176,6 +190,14 @@ namespace Framework {
 		_text = text;
 		_colour = colour;
 		_anchor = anchor_position;
+		_scale = _font_ptr->get_spritesheet_ptr()->get_scale();
+	}
+	Text::Text(Font* font, std::string text, Colour colour, float scale, Font::AnchorPosition anchor_position) {
+		_font_ptr = font;
+		_text = text;
+		_colour = colour;
+		_anchor = anchor_position;
+		_scale = scale;
 	}
 
 	void Text::render(vec2 position) {
@@ -188,7 +210,7 @@ namespace Framework {
 		render(position, _colour, anchor_position);
 	}
 	void Text::render(vec2 position, Colour colour, Font::AnchorPosition anchor_position) {
-		_font_ptr->render_text(_text, position, colour, anchor_position);
+		_font_ptr->render_text(_text, position, colour, _scale, anchor_position);
 	}
 
 	void Text::set_text(std::string text) {

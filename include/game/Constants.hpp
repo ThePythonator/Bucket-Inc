@@ -30,10 +30,22 @@ namespace WINDOW {
 namespace STRINGS {
 	namespace TITLE {
 		extern const std::vector<std::string> BUTTONS;
+		extern const std::string TITLE;
 	}
 
 	namespace SETTINGS {
 		extern const std::vector<std::string> BUTTONS;
+		extern const std::string TITLE;
+	}
+
+	namespace PAUSED {
+		extern const std::vector<std::string> BUTTONS;
+		extern const std::string TITLE;
+	}
+
+	namespace END {
+		extern const std::vector<std::string> BUTTONS;
+		extern const std::string TITLE;
 	}
 }
 
@@ -49,6 +61,10 @@ namespace PATHS {
 		extern const std::string POPUP;
 		extern const std::string BUTTON_UNSELECTED;
 		extern const std::string BUTTON_SELECTED;
+	}
+
+	namespace SAVE_DATA {
+		extern const std::string HIGHSCORE;
 	}
 }
 
@@ -110,6 +126,7 @@ namespace FONTS {
 
 namespace COLOURS {
 	extern const Framework::Colour BLACK;
+	extern const Framework::Colour GREY;
 	extern const Framework::Colour WHITE;
 }
 
@@ -153,6 +170,8 @@ namespace SPRITE {
 
 		extern const uint8_t PIPE_VERTICAL;
 		extern const uint8_t PIPE_HORIZONTAL;
+
+		extern const uint8_t SCORE_BOX;
 	}
 
 	namespace RECT {
@@ -168,6 +187,7 @@ namespace SPRITE {
 	extern const Framework::vec2 BOX_POSITION;
 
 	extern const uint8_t BUCKET_SCALE;
+	extern const float TITLE_FONT_SCALE;
 }
 
 namespace CURVES {
@@ -207,6 +227,15 @@ namespace BUTTONS {
 			TOTAL
 		};
 	}
+
+	namespace END {
+		enum END {
+			RETRY,
+			EXIT,
+
+			TOTAL
+		};
+	}
 }
 
 namespace GAME {
@@ -221,4 +250,12 @@ namespace GAME {
 	extern const uint8_t MAX_CRACKED_PIPES;
 
 	extern const float DROP_FALL_RATE;
+
+	extern const uint8_t MAX_WATER_HEIGHT;
+
+	extern const Framework::vec2 BUCKET_COLLIDER_SIZE;
+	extern const Framework::vec2 BUCKET_COLLIDER_OFFSET;
+	extern const Framework::vec2 BUCKET_SIZE;
+	extern const Framework::vec2 DROP_COLLIDER;
+	extern const Framework::vec2 DROP_COLLIDER_OFFSET;
 }

@@ -51,6 +51,12 @@ void IntroStage::render() {
 void TitleStage::start() {
 	buttons = setup_menu_buttons(graphics_objects, STRINGS::TITLE::BUTTONS);
 
+	// Load highscore
+	highscore = load_save_data(graphics_objects->asset_path);
+
+	// Set title text
+	_title_text = Framework::Text(graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT], STRINGS::TITLE::TITLE, COLOURS::GREY, SPRITE::TITLE_FONT_SCALE);
+
 	// Start transition
 	set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
 	transition->open();
@@ -94,7 +100,8 @@ bool TitleStage::update(float dt) {
 }
 
 void TitleStage::render() {
-	render_menu(graphics_objects, transition->percent(), buttons, _button_selected);
+	_title_text.set_text(STRINGS::TITLE::TITLE + std::to_string(highscore));
+	render_menu_with_text(graphics_objects, transition->percent(), buttons, _button_selected, _title_text);
 
 	transition->render(graphics_objects->graphics_ptr);
 } 
@@ -103,6 +110,9 @@ void TitleStage::render() {
 
 void SettingsStage::start() {
 	buttons = setup_menu_buttons(graphics_objects, STRINGS::SETTINGS::BUTTONS);
+
+	// Set title text
+	_title_text = Framework::Text(graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT], STRINGS::SETTINGS::TITLE, COLOURS::GREY, SPRITE::TITLE_FONT_SCALE);
 
 	// Start transition
 	set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
@@ -153,7 +163,7 @@ bool SettingsStage::update(float dt) {
 }
 
 void SettingsStage::render() {
-	render_menu(graphics_objects, transition->percent(), buttons, _button_selected);
+	render_menu_with_text(graphics_objects, transition->percent(), buttons, _button_selected, _title_text);
 
 	transition->render(graphics_objects->graphics_ptr);
 }
@@ -166,7 +176,8 @@ GameStage::GameStage() {
 
 	cracked_pipe_gen_timer.start();
 
-	create_cracked_pipe(cracked_pipes, cracked_pipe_gen_timer, cracked_pipe_gen_time, cracked_pipe_drop_count);
+	// Create first cracked pipe
+	create_cracked_pipe(cracked_pipes, cracked_pipe_drop_count);
 
 	// Setup
 	water_level = 0;
@@ -188,6 +199,8 @@ void GameStage::start() {
 		set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
 	}
 	transition->open();
+
+	paused = false;
 }
 
 void GameStage::end() {
@@ -200,6 +213,8 @@ bool GameStage::update(float dt) {
 
 	cracked_pipe_gen_timer.update(dt);
 
+	// Set bucket pos
+	bucket_pos = input->get_mouse()->position() - GAME::BUCKET_SIZE / 2;
 
 	create_cracked_pipe(cracked_pipes, cracked_pipe_gen_timer, cracked_pipe_gen_time, cracked_pipe_drop_count);
 
@@ -213,27 +228,39 @@ bool GameStage::update(float dt) {
 
 	cracked_pipes.erase(std::remove_if(cracked_pipes.begin(), cracked_pipes.end(), [](CrackedPipe& pipe) { return pipe.finished(); }), cracked_pipes.end());
 
-
 	// All a mess!
 	for (Framework::vec2& drop_pos : drops) {
 		drop_pos.y += GAME::DROP_FALL_RATE * dt;
 
 		if (drop_pos.y >= WINDOW::HEIGHT / 2) {
-			water_level += 1;
+			water_level++;
+		}
+		else if (Framework::colliding(Framework::Rect((drop_pos + GAME::DROP_COLLIDER_OFFSET) * SPRITE::SCALE, GAME::DROP_COLLIDER * SPRITE::SCALE), Framework::Rect(bucket_pos + GAME::BUCKET_COLLIDER_OFFSET, GAME::BUCKET_COLLIDER_SIZE))) {
+			// We caught the drop of water
+			score++;
+			drop_pos.y = WINDOW::HEIGHT; // set it to be completely off the screen so that it gets removed (but don't deal damage because of it)
 		}
 	}
 
-	drops.erase(std::remove_if(drops.begin(), drops.end(), [](Framework::vec2& pos) { return pos.y >= WINDOW::HEIGHT / 2; }), drops.end());
+	drops.erase(std::remove_if(drops.begin(), drops.end(), [](Framework::vec2& pos) { return pos.y >= WINDOW::HEIGHT / SPRITE::SCALE; }), drops.end());
 
-	if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
-		// User has paused
-		// Pass this stage to PausedStage so that it still renders in the background
-		paused = true;
+	if (transition->is_open()) {
+		if (water_level > GAME::MAX_WATER_HEIGHT) {
+			// End game
+			//set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
+			set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::PAUSE_TRANSITION]); // maybe use pause transition?
+			transition->close();
+		}
 
-		// We need to change transition so it only fades to semi-transparent
-		set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::PAUSE_TRANSITION]);
+		if (input->just_down(Framework::KeyHandler::Key::ESCAPE) || input->just_down(Framework::KeyHandler::Key::P)) {
+			// User has paused
+			// Pass this stage to PausedStage so that it still renders in the background
+			paused = true;
 
-		transition->close();
+			// We need to change transition so it only fades to semi-transparent
+			set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::PAUSE_TRANSITION]);
+			transition->close();
+		}
 	}
 
 	if (transition->is_closed()) {
@@ -243,7 +270,7 @@ bool GameStage::update(float dt) {
 		}
 		else {
 			// Must be end of game
-			// TODO
+			finish(new EndStage(score));
 		}
 	}
 
@@ -265,8 +292,11 @@ void GameStage::render() {
 	}
 
 	// Render bucket
-	// TODO - save bucket pos, get in update() and use that for rendering and collision checks
-	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BUCKET_RECT, input->get_mouse()->position() / SPRITE::BUCKET_SCALE - SPRITE::RECT::BUCKET_RECT.size / 2, SPRITE::BUCKET_SCALE);
+	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->rect(SPRITE::RECT::BUCKET_RECT, bucket_pos, SPRITE::BUCKET_SCALE);
+
+	// Render score
+	graphics_objects->spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::MAIN_SPRITESHEET]->sprite(SPRITE::INDEX::SCORE_BOX, Framework::Vec(WINDOW::WIDTH / SPRITE::UI_SCALE - SPRITE::SIZE, 0), SPRITE::UI_SCALE);
+	graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT]->render_text(std::to_string(score), Framework::Vec(WINDOW::WIDTH - SPRITE::SIZE_HALF, 0), COLOURS::BLACK, Framework::Font::TOP_RIGHT);
 
 	transition->render(graphics_objects->graphics_ptr);
 }
@@ -279,7 +309,10 @@ PausedStage::PausedStage(BaseStage* background_stage) : BaseStage() {
 }
 
 void PausedStage::start() {
-	//buttons = setup_menu_buttons(graphics_objects, STRINGS::PAUSED::BUTTONS);
+	buttons = setup_menu_buttons(graphics_objects, STRINGS::PAUSED::BUTTONS);
+
+	// Set title text
+	_title_text = Framework::Text(graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT], STRINGS::PAUSED::TITLE, COLOURS::GREY, SPRITE::TITLE_FONT_SCALE);
 
 	// Start transition (but we don't actually render the fade-in)
 	set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
@@ -293,9 +326,20 @@ bool PausedStage::update(float dt) {
 		transition->close();
 	}
 
+	// Update buttons
+	for (Framework::Button& button : buttons) {
+		button.update(input);
+
+		if (button.pressed() && transition->is_open()) {
+			_button_selected = button.get_id();
+			transition->close();
+		}
+	}
+
 	if (transition->is_closed()) {
 		if (_button_selected == BUTTONS::PAUSED::EXIT) {
-			// todo
+			delete _background_stage;
+			finish(new TitleStage());
 		}
 		else {
 			// Return to game (exit pause)
@@ -310,8 +354,72 @@ void PausedStage::render() {
 	// Render background stage
 	_background_stage->render();
 
-	render_popup_and_buttons(graphics_objects, transition->percent(), buttons, transition->state() == Framework::BaseTransition::TransitionState::CLOSING || transition->is_closed() ? FadeState::OUT : FadeState::IN);
+	render_popup_and_buttons_with_text(graphics_objects, transition->percent(), buttons, transition->state() == Framework::BaseTransition::TransitionState::CLOSING || transition->is_closed() ? FadeState::OUT : FadeState::IN, _title_text);
 
 	// Only show transition if exiting
 	if (transition->state() == Framework::BaseTransition::TransitionState::CLOSING && _button_selected == BUTTONS::PAUSED::EXIT) transition->render(graphics_objects->graphics_ptr);
+}
+
+// EndStage
+
+EndStage::EndStage(uint16_t _score) {
+	score = _score;
+}
+
+void EndStage::start() {
+	buttons = setup_menu_buttons(graphics_objects, STRINGS::END::BUTTONS);
+
+	// Set title text
+	_title_text = Framework::Text(graphics_objects->font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT], STRINGS::END::TITLE, COLOURS::GREY, SPRITE::TITLE_FONT_SCALE);
+
+	// Start transition
+	set_transition(graphics_objects->transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION]);
+	transition->open();
+
+	// Write score if greater than current highscore
+	if (score > load_save_data(graphics_objects->asset_path)) {
+		write_save_data(graphics_objects->asset_path, score);
+	}
+}
+
+bool EndStage::update(float dt) {
+	transition->update(dt);
+
+	// Update buttons
+	for (Framework::Button& button : buttons) {
+		button.update(input);
+
+		if (button.pressed() && transition->is_open()) {
+			_button_selected = button.get_id();
+			transition->close();
+		}
+	}
+
+	if (transition->is_closed()) {
+		switch (_button_selected) {
+		case BUTTONS::END::RETRY:
+			// Retry
+			finish(new GameStage());
+			break;
+
+		case BUTTONS::END::EXIT:
+			// Go back!
+			finish(new TitleStage());
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	return true;
+}
+
+void EndStage::render() {
+	// todo: render score
+	
+	_title_text.set_text(STRINGS::END::TITLE + std::to_string(score));
+	render_menu_with_text(graphics_objects, transition->percent(), buttons, _button_selected, _title_text);
+
+	transition->render(graphics_objects->graphics_ptr);
 }

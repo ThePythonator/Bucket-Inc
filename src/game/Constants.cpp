@@ -26,6 +26,8 @@ namespace STRINGS {
 			"Settings",
 			"Quit"
 		};
+
+		const std::string TITLE = "Best: ";
 	}
 
 	namespace SETTINGS {
@@ -34,6 +36,26 @@ namespace STRINGS {
 			"Music",
 			"Back"
 		};
+
+		const std::string TITLE = "Settings";
+	}
+
+	namespace PAUSED {
+		const std::vector<std::string> BUTTONS = {
+			"Resume",
+			"Exit"
+		};
+
+		const std::string TITLE = "Paused";
+	}
+
+	namespace END {
+		const std::vector<std::string> BUTTONS = {
+			"Retry",
+			"Exit"
+		};
+
+		const std::string TITLE = "Score: ";
 	}
 }
 
@@ -49,6 +71,10 @@ namespace PATHS {
 		const std::string POPUP = "popup.png";
 		const std::string BUTTON_UNSELECTED = "button_unselected.png";
 		const std::string BUTTON_SELECTED = "button_selected.png";
+	}
+
+	namespace SAVE_DATA {
+		const std::string HIGHSCORE = "highscore.json";
 	}
 }
 
@@ -82,6 +108,7 @@ namespace FONTS {
 
 namespace COLOURS {
 	const Framework::Colour BLACK{ 0x00, 0x00, 0x00 };
+	const Framework::Colour GREY{ 0x8B, 0x97, 0xB6 };
 	const Framework::Colour WHITE{ 0xFF, 0xFF, 0xFF };
 }
 
@@ -125,6 +152,8 @@ namespace SPRITE {
 
 		const uint8_t PIPE_VERTICAL = 3;
 		const uint8_t PIPE_HORIZONTAL = 2;
+
+		const uint8_t SCORE_BOX = 40;
 	}
 
 	namespace RECT {
@@ -149,6 +178,7 @@ namespace SPRITE {
 	const Framework::vec2 BOX_POSITION = Framework::Vec(SIZE * 1, SIZE * 4);
 
 	const uint8_t BUCKET_SCALE = SCALE / 2;
+	const float TITLE_FONT_SCALE = 1.5f * UI_SCALE;
 }
 
 namespace CURVES {
@@ -169,16 +199,24 @@ namespace BUTTONS {
 }
 
 namespace GAME {
-	const float INITIAL_CRACKED_PIPE_DELAY = 6.0f;
+	const float INITIAL_CRACKED_PIPE_DELAY = 3.0f;
 	const float INITIAL_CRACKED_PIPE_DROP_COUNT = 1.5f;
 
-	const float CRACKED_PIPE_DELAY_DECREASE_FACTOR = 0.95f;
-	const float CRACKED_PIPE_DROP_INCREASE_FACTOR = 1.05f;
+	const float CRACKED_PIPE_DELAY_DECREASE_FACTOR = 0.98f;
+	const float CRACKED_PIPE_DROP_INCREASE_FACTOR = 1.02f;
 
-	const float CRACKED_PIPE_DROP_DELAY_MIN = 1.0f;
+	const float CRACKED_PIPE_DROP_DELAY_MIN = 0.5f;
 	const float CRACKED_PIPE_DROP_DELAY_MAX = 2.0f;
 
 	const uint8_t MAX_CRACKED_PIPES = 8;
 
-	const float DROP_FALL_RATE = 100.0f;
+	const float DROP_FALL_RATE = 120.0f;
+
+	const uint8_t MAX_WATER_HEIGHT = 3;
+
+	const Framework::vec2 BUCKET_COLLIDER_SIZE = Framework::Vec(SPRITE::SIZE_HALF, SPRITE::SIZE_HALF);
+	const Framework::vec2 BUCKET_COLLIDER_OFFSET = Framework::Vec(SPRITE::SIZE, SPRITE::SIZE * 2);
+	const Framework::vec2 BUCKET_SIZE = Framework::Vec(SPRITE::SIZE * 2, SPRITE::SIZE * 3);
+	const Framework::vec2 DROP_COLLIDER = Framework::Vec(SPRITE::SIZE_HALF, SPRITE::SIZE_HALF);
+	const Framework::vec2 DROP_COLLIDER_OFFSET = Framework::Vec(SPRITE::SIZE_HALF / 2, SPRITE::SIZE_HALF / 2 + SPRITE::SIZE_HALF);
 }

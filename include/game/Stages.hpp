@@ -31,6 +31,9 @@ public:
 
 private:
 	uint8_t _button_selected = BUTTONS::NONE;
+	Framework::Text _title_text;
+
+	uint16_t highscore = 0;
 };
 
 class SettingsStage : public Framework::BaseStage {
@@ -42,6 +45,7 @@ public:
 
 private:
 	uint8_t _button_selected = BUTTONS::NONE;
+	Framework::Text _title_text;
 };
 
 class GameStage : public Framework::BaseStage {
@@ -66,6 +70,8 @@ private:
 
 	std::vector<CrackedPipe> cracked_pipes;
 	std::vector<Framework::vec2> drops;
+
+	Framework::vec2 bucket_pos = Framework::VEC_NULL;
 };
 
 class PausedStage : public Framework::BaseStage {
@@ -79,6 +85,23 @@ public:
 
 private:
 	uint8_t _button_selected = BUTTONS::NONE;
+	Framework::Text _title_text;
 
 	BaseStage* _background_stage;
+};
+
+class EndStage : public Framework::BaseStage {
+public:
+	EndStage(uint16_t _score);
+
+	void start();
+
+	bool update(float dt);
+	void render();
+
+private:
+	uint8_t _button_selected = BUTTONS::NONE;
+	Framework::Text _title_text;
+
+	uint16_t score = 0;
 };

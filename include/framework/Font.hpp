@@ -42,12 +42,15 @@ namespace Framework {
 		Font(Graphics* graphics, Spritesheet* spritesheet, uint8_t spacing = 1);
 
 		void render_text(std::string text, vec2 position, Colour colour, AnchorPosition anchor_position = AnchorPosition::CENTER_CENTER);
+		void render_text(std::string text, vec2 position, Colour colour, float scale, AnchorPosition anchor_position = AnchorPosition::CENTER_CENTER);
 
 		Rect character_rect(uint8_t c);
 		bool valid_character(uint8_t c);
 
+		Spritesheet* get_spritesheet_ptr();
+
 	private:
-		void render_char(uint8_t c, vec2 position);
+		void render_char(uint8_t c, vec2 position, float scale);
 		void set_colour(Colour colour);
 
 		Graphics* graphics_ptr = nullptr;
@@ -62,6 +65,7 @@ namespace Framework {
 	public:
 		Text();
 		Text(Font* font, std::string text, Colour colour, Font::AnchorPosition anchor_position = Font::AnchorPosition::CENTER_CENTER);
+		Text(Font* font, std::string text, Colour colour, float scale, Font::AnchorPosition anchor_position = Font::AnchorPosition::CENTER_CENTER);
 
 		void render(vec2 position);
 		void render(vec2 position, Colour colour);
@@ -75,5 +79,6 @@ namespace Framework {
 		std::string _text;
 		Colour _colour;
 		Font::AnchorPosition _anchor = Font::AnchorPosition::CENTER_CENTER;
+		float _scale = 1.0f;
 	};
 }

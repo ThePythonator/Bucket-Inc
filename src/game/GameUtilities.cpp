@@ -66,6 +66,29 @@ void render_popup_and_buttons(Framework::GraphicsObjects* graphics_objects, floa
 	}
 }
 
+void render_popup_and_buttons_with_text(Framework::GraphicsObjects* graphics_objects, float transition_percent, std::vector<Framework::Button>& buttons, FadeState state, Framework::Text& text) {
+	// Calculate offset used for animating menu options
+	float t = Framework::clamp(transition_percent, 0.0f, 1.0f);
+	if (state == FadeState::OUT) {
+		// Reverse animation
+		t = 1.0f - t;
+	}
+	Framework::vec2 offset = Framework::Curves::bezier(CURVES::BEZIER::TITLE_CONTROL_POINTS, t) * WINDOW::SIZE;
+
+	// Render background for options
+	Framework::vec2 scaled_popup_size = graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->get_size() * SPRITE::UI_SCALE;
+	graphics_objects->image_ptrs[GRAPHICS_OBJECTS::IMAGES::POPUP]->render(Framework::Rect(WINDOW::SIZE_HALF - scaled_popup_size / 2 + offset, scaled_popup_size));
+
+	text.render(Framework::Vec(WINDOW::WIDTH_HALF, WINDOW::HEIGHT * 0.275f) + offset);
+
+	// Shift button positions so they're animated too
+	// Render buttons
+	for (uint8_t i = 0; i < buttons.size(); i++) {
+		buttons[i].set_position(buttons[i].initial_position() + offset);
+		buttons[i].render();
+	}
+}
+
 void render_menu(Framework::GraphicsObjects* graphics_objects, float transition_percent, std::vector<Framework::Button>& buttons, uint8_t button_selected) {
 	render_background_scene(graphics_objects);
 
@@ -79,6 +102,15 @@ void render_menu_with_fade(Framework::GraphicsObjects* graphics_objects, Framewo
 	render_menu(graphics_objects, transition_timer.time() / TRANSITIONS::FADE_TIME, buttons, button_selected);
 
 	handle_fade(graphics_objects, transition_timer.time() / TRANSITIONS::FADE_TIME, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT);
+}
+
+void render_menu_with_text(Framework::GraphicsObjects* graphics_objects, float transition_percent, std::vector<Framework::Button>& buttons, uint8_t button_selected, Framework::Text& text) {
+	render_background_scene(graphics_objects);
+
+	// Fade out background graphics slightly
+	graphics_objects->graphics_ptr->fill(COLOURS::BLACK, 0x7F);
+
+	render_popup_and_buttons_with_text(graphics_objects, transition_percent, buttons, button_selected == BUTTONS::NONE ? FadeState::IN : FadeState::OUT, text);
 }
 
 void handle_fade(Framework::GraphicsObjects* graphics_objects, float transition_percent, FadeState state, uint8_t low, uint8_t high) {
@@ -140,6 +172,16 @@ void create_cracked_pipe(std::vector<CrackedPipe>& cracked_pipes, Framework::Tim
 		return;
 	}
 
+	create_cracked_pipe(cracked_pipes, cracked_pipe_drop_count);
+
+	cracked_pipe_gen_timer.reset();
+	cracked_pipe_gen_timer.start();
+
+	cracked_pipe_gen_time *= GAME::CRACKED_PIPE_DELAY_DECREASE_FACTOR;
+	cracked_pipe_drop_count *= GAME::CRACKED_PIPE_DROP_INCREASE_FACTOR;
+}
+
+void create_cracked_pipe(std::vector<CrackedPipe>& cracked_pipes, float cracked_pipe_drop_count) {
 	uint8_t index = 0;
 	uint8_t id = 0;
 	bool found = false;
@@ -168,10 +210,24 @@ void create_cracked_pipe(std::vector<CrackedPipe>& cracked_pipes, Framework::Tim
 	}
 
 	cracked_pipes.push_back(CrackedPipe(index, id, static_cast<uint8_t>(cracked_pipe_drop_count)));
+}
 
-	cracked_pipe_gen_timer.reset();
-	cracked_pipe_gen_timer.start();
+uint16_t load_save_data(std::string assets_path) {
+	Framework::JSONHandler::json json_data = Framework::JSONHandler::read(assets_path + PATHS::SAVE_DATA::HIGHSCORE);
+	uint16_t highscore = 0;
+	try {
+		highscore = json_data.at("highscore").get<uint8_t>();
+	}
+	//catch (const JSONHandler::type_error& error) {
+	catch (const std::exception& e) {
+		printf("Error: %s\n", e.what());
+		printf("Invalid data, using defaults...\n");
+	}
+	return highscore;
+}
 
-	cracked_pipe_gen_time *= GAME::CRACKED_PIPE_DELAY_DECREASE_FACTOR;
-	cracked_pipe_drop_count *= GAME::CRACKED_PIPE_DROP_INCREASE_FACTOR;
+void write_save_data(std::string assets_path, uint16_t highscore) {
+	Framework::JSONHandler::json json_data;
+	json_data["highscore"] = highscore;
+	Framework::JSONHandler::write(assets_path + PATHS::SAVE_DATA::HIGHSCORE, json_data);
 }

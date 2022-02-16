@@ -64,6 +64,53 @@ namespace Framework {
 		}
 	}
 
+	bool Image::refresh(uint8_t source_flag) {
+		// NOT TESTED!!!
+
+		// Don't allow source_flag to have multiple sources
+		if (source_flag == Flags::SDL_SURFACE) {
+			// Update texture from surface
+			// Check we actually have a surface stored
+			if (types & Flags::SDL_SURFACE) {
+				// Create texture from the stored surface
+				SDL_Texture* temp_texture = SDL_CreateTextureFromSurface(graphics_ptr->get_renderer(), surface);
+
+				if (temp_texture == NULL)
+				{
+					printf("Unable to convert surface to texture!\nSDL Error: %s\n", SDL_GetError());
+					return false;
+				}
+				else {
+					texture = temp_texture;
+					return true;
+				}
+			}
+			else {
+				// Don't have a surface available
+				return false;
+			}
+		}
+		else if (source_flag == Flags::SDL_TEXTURE) {
+			// Updates surface from texture
+			// Not supported by SDL
+			return false;
+		}
+		else {
+			// Multiple or no sources, or not supported
+			return false;
+		}
+
+		/*// First check, source_flag > 0, then check it is an exact power of two
+		// n & (n-1) returns 0 if n is an exact power of two, so we need to invert it
+		if (source_flag && !(source_flag & (source_flag - 1))) {
+			// todo
+			return true;
+		}
+		else {
+			return false;
+		}*/
+	}
+
 	void Image::render(Rect source_rect, Rect destination_rect) {
 		if (source_rect.size == vec2{ 0.0f, 0.0f }) {
 			source_rect.size = get_size();

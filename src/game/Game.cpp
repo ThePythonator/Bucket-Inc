@@ -14,6 +14,7 @@ void Game::end() {
 
 void Game::load_data() {
 	std::string ASSETS_PATH = Framework::SDLUtils::find_assets_path(PATHS::IMAGES::LOCATION + PATHS::IMAGES::MAIN_SPRITESHEET, PATHS::DEPTH);
+	graphics_objects.asset_path = ASSETS_PATH;
 	std::string IMAGES_PATH = ASSETS_PATH + PATHS::IMAGES::LOCATION;
 
 	// Load spritesheet image
@@ -41,7 +42,7 @@ void Game::load_data() {
 
 	// Create font from font spritesheet
 	graphics_objects.font_ptrs[GRAPHICS_OBJECTS::FONTS::MAIN_FONT] = new Framework::Font(graphics_objects.graphics_ptr, graphics_objects.spritesheet_ptrs[GRAPHICS_OBJECTS::SPRITESHEETS::FONT_SPRITESHEET], FONTS::SPACING::MAIN_FONT);
-
+	
 	// Create transitions
 	graphics_objects.transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::FADE_TRANSITION] = new Framework::FadeTransition(COLOURS::BLACK, TRANSITIONS::FADE_TIME);
 	graphics_objects.transition_ptrs[GRAPHICS_OBJECTS::TRANSITIONS::PAUSE_TRANSITION] = new Framework::FadeTransition(COLOURS::BLACK, TRANSITIONS::PAUSE_FADE_TIME, TRANSITIONS::PAUSE_ALPHA);

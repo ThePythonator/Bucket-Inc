@@ -7,7 +7,7 @@ namespace Framework {
 	}
 
 	Spritesheet::Spritesheet(Graphics* graphics, Image* spritesheet_image, uint8_t sprite_size, uint8_t default_scale, bool scale_positions) {
-		_graphics = graphics;
+		//_graphics = graphics;
 		_spritesheet_image = spritesheet_image;
 
 		_sprite_size = sprite_size;

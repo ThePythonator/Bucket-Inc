@@ -142,5 +142,37 @@ namespace Framework {
 	void BaseGame::quit() {
 		// Clear game data
 		clear_data();
+
+		// Clear graphics objects stuff
+
+		// Clear spritesheets
+		for (Framework::Spritesheet* spritesheet_ptr : graphics_objects.spritesheet_ptrs) {
+			delete spritesheet_ptr;
+		}
+		graphics_objects.spritesheet_ptrs.clear();
+
+		// Clear images
+		for (Framework::Image* image_ptr : graphics_objects.image_ptrs) {
+			image_ptr->free();
+			delete image_ptr;
+		}
+		graphics_objects.image_ptrs.clear();
+
+		// Clear fonts
+		for (Framework::Font* font_ptr : graphics_objects.font_ptrs) {
+			delete font_ptr;
+		}
+		graphics_objects.font_ptrs.clear();
+
+		// Clear transitions
+		for (Framework::BaseTransition* transition_ptr : graphics_objects.transition_ptrs) {
+			delete transition_ptr;
+		}
+		graphics_objects.transition_ptrs.clear();
+
+		
+		// Destroy renderer and window
+		SDL_DestroyRenderer(renderer);
+		SDL_DestroyWindow(window);
 	}
 }

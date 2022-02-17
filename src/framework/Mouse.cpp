@@ -15,7 +15,8 @@ namespace Framework {
 		}
 
 		bool Mouse::pressed(MouseButton button) {
-			return button_state(button) == MouseButtonState::JUST_PRESSED || button_state(button) == MouseButtonState::STILL_DOWN;
+			MouseButtonState state = button_state(button);
+			return state == MouseButtonState::JUST_PRESSED || state == MouseButtonState::STILL_DOWN;
 		}
 
 		void Mouse::update() {
